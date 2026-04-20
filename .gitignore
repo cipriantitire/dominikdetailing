@@ -7,6 +7,7 @@ out/
 
 # Vercel
 .vercel/
+.vercel-auth/
 
 # Environment files
 .env
