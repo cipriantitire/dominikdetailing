@@ -1,0 +1,17 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "chatgpt.openOnStartup": true,
+    "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+    "search.exclude": {
+      "**/.next": true,
+      "**/node_modules": true,
+      "**/.vercel": true
+    }
+  }
+}
+

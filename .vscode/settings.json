@@ -1,0 +1,12 @@
+{
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+  "search.exclude": {
+    "**/.next": true,
+    "**/node_modules": true,
+    "**/.vercel": true
+  },
+  "files.exclude": {
+    "**/.env.local": true
+  }
+}
+
