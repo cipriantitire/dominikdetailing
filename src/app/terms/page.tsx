@@ -14,7 +14,7 @@ export default function TermsPage() {
             Terms of Service
           </h1>
         </div>
-        <div className="mt-8 space-y-6 text-[13px] leading-relaxed text-[#5a5a65]">
+        <div className="mt-8 space-y-6 text-[13px] leading-relaxed text-[#686878]">
           <p>
             By using the Dominik Detailing website and submitting a booking request, you agree to these terms of service.
           </p>

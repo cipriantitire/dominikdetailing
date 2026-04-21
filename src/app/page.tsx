@@ -90,9 +90,9 @@ export default function Home() {
           <h1 className="mx-auto mt-7 max-w-3xl text-[40px] font-bold leading-[1.05] tracking-tight md:text-[64px] lg:text-[72px]">
             Premium car care.
             <br />
-            <span className="text-[#8a8a95]">Mobile.</span>
+            <span className="text-[#9696a3]">Mobile.</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-xl text-[16px] leading-relaxed text-[#8a8a95] md:text-[17px]">
+          <p className="mx-auto mt-6 max-w-xl text-[16px] leading-relaxed text-[#9696a3] md:text-[17px]">
             Transform your vehicle with professional detailing, ceramic coating, and paint correction. We come to your home or workplace across London.
           </p>
 
@@ -100,7 +100,7 @@ export default function Home() {
             <HeroRequestForm />
           </div>
 
-          <div className="mx-auto mt-10 flex flex-wrap items-center justify-center gap-6 text-[12px] font-medium uppercase tracking-wider text-[#5a5a65]">
+          <div className="mx-auto mt-10 flex flex-wrap items-center justify-center gap-6 text-[12px] font-medium uppercase tracking-wider text-[#686878]">
             <span className="flex items-center gap-2">
               <ShieldTick size={15} className="text-[#1d4ed8]" />
               Satisfaction Guaranteed
@@ -129,7 +129,7 @@ export default function Home() {
                 Premium Auto Care
               </h2>
             </div>
-            <p className="max-w-md text-[14px] leading-relaxed text-[#5a5a65]">
+            <p className="max-w-md text-[14px] leading-relaxed text-[#686878]">
               From basic maintenance to complete transformations. Every service is performed to the same meticulous standard.
             </p>
           </div>
@@ -162,10 +162,10 @@ export default function Home() {
                       From &pound;{service.startingPrice}
                     </span>
                   </div>
-                  <p className="mt-1.5 text-[13px] text-[#5a5a65]">{service.shortDescription}</p>
+                  <p className="mt-1.5 text-[13px] text-[#686878]">{service.shortDescription}</p>
                   <ul className="mt-4 space-y-2">
                     {service.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2 text-[13px] text-[#8a8a95]">
+                      <li key={feature} className="flex items-start gap-2 text-[13px] text-[#9696a3]">
                         <CheckVerified02 size={15} className="mt-0.5 shrink-0 text-[#1d4ed8]" />
                         {feature}
                       </li>
@@ -222,7 +222,7 @@ export default function Home() {
               <h2 className="mt-3 text-[32px] font-bold tracking-tight md:text-[44px]">
                 See the Difference
               </h2>
-              <p className="mt-4 max-w-md text-[14px] leading-relaxed text-[#5a5a65]">
+              <p className="mt-4 max-w-md text-[14px] leading-relaxed text-[#686878]">
                 Real results from real jobs. Every vehicle receives the same meticulous attention, whether it is a daily driver or a weekend pride and joy.
               </p>
               <Link
@@ -297,16 +297,16 @@ export default function Home() {
                     <Star06 key={i} size={14} />
                   ))}
                 </div>
-                <p className="mt-4 text-[14px] leading-relaxed text-[#8a8a95]">
+                <p className="mt-4 text-[14px] leading-relaxed text-[#9696a3]">
                   &ldquo;{review.text}&rdquo;
                 </p>
                 <div className="mt-5 flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1a1a20] text-[11px] font-bold text-[#5a5a65]">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1a1a20] text-[11px] font-bold text-[#686878]">
                     {review.name.charAt(0)}
                   </div>
                   <div>
                     <p className="text-[13px] font-semibold">{review.name}</p>
-                    <p className="text-[11px] text-[#3a3a45]">{review.location}</p>
+                    <p className="text-[11px] text-[#484855]">{review.location}</p>
                   </div>
                 </div>
               </article>
@@ -335,14 +335,14 @@ export default function Home() {
               <h2 className="mt-3 text-[32px] font-bold tracking-tight md:text-[44px]">
                 Mobile Service Across London
               </h2>
-              <p className="mt-4 max-w-md text-[14px] leading-relaxed text-[#5a5a65]">
+              <p className="mt-4 max-w-md text-[14px] leading-relaxed text-[#686878]">
                 We bring professional-grade equipment and products to your driveway, office car park, or preferred location. No need to travel.
               </p>
               <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-3">
                 {siteConfig.serviceArea.map((area) => (
                   <span
                     key={area}
-                    className="flex items-center gap-2 text-[13px] text-[#8a8a95]"
+                    className="flex items-center gap-2 text-[13px] text-[#9696a3]"
                   >
                     <CheckVerified02 size={14} className="shrink-0 text-[#1d4ed8]" />
                     {area}
@@ -390,14 +390,14 @@ export default function Home() {
                 key={item.step}
                 className="relative rounded-xl border border-white/[0.04] bg-[#0f0f14] p-6"
               >
-                <span className="text-[11px] font-bold uppercase tracking-widest text-[#3a3a45]">
+                <span className="text-[11px] font-bold uppercase tracking-widest text-[#484855]">
                   Step {item.step}
                 </span>
                 <div className="mt-4 flex h-10 w-10 items-center justify-center rounded-lg bg-[#1d4ed8]/10 text-[#1d4ed8]">
                   {item.icon}
                 </div>
                 <h3 className="mt-4 text-[18px] font-semibold">{item.title}</h3>
-                <p className="mt-2 text-[13px] leading-relaxed text-[#5a5a65]">
+                <p className="mt-2 text-[13px] leading-relaxed text-[#686878]">
                   {item.desc}
                 </p>
               </div>
@@ -427,7 +427,7 @@ export default function Home() {
                 <summary className="flex cursor-pointer items-center justify-between p-5 text-[14px] font-semibold text-white transition hover:bg-[#141419] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded-xl">
                   {faq.question}
                   <svg
-                    className="h-4 w-4 shrink-0 text-[#5a5a65] transition-transform duration-300 group-open:rotate-180"
+                    className="h-4 w-4 shrink-0 text-[#686878] transition-transform duration-300 group-open:rotate-180"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -437,7 +437,7 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
-                <div className="px-5 pb-5 text-[13px] leading-relaxed text-[#5a5a65]">
+                <div className="px-5 pb-5 text-[13px] leading-relaxed text-[#686878]">
                   {faq.answer}
                 </div>
               </details>
@@ -452,7 +452,7 @@ export default function Home() {
           <h2 className="text-[28px] font-bold tracking-tight md:text-[40px]">
             Ready to give your car the care it deserves?
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-[14px] leading-relaxed text-[#5a5a65]">
+          <p className="mx-auto mt-4 max-w-lg text-[14px] leading-relaxed text-[#686878]">
             Request a booking today. We will confirm availability and pricing within 24 hours.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">

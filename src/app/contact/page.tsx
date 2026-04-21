@@ -23,7 +23,7 @@ export default function ContactPage() {
           <h1 className="mt-3 text-[32px] font-bold tracking-tight md:text-[48px]">
             Get in <span className="text-[#1d4ed8]">Touch</span>
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed text-[#5a5a65]">
+          <p className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed text-[#686878]">
             Have a question or ready to book? Reach out however suits you best.
           </p>
         </div>
@@ -65,12 +65,12 @@ export default function ContactPage() {
                     {item.href ? (
                       <a
                         href={item.href}
-                        className="mt-0.5 whitespace-pre-line text-[13px] text-[#5a5a65] transition hover:text-[#8a8a95] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
+                        className="mt-0.5 whitespace-pre-line text-[13px] text-[#686878] transition hover:text-[#9696a3] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
                       >
                         {item.value}
                       </a>
                     ) : (
-                      <p className="mt-0.5 whitespace-pre-line text-[13px] text-[#5a5a65]">
+                      <p className="mt-0.5 whitespace-pre-line text-[13px] text-[#686878]">
                         {item.value}
                       </p>
                     )}
@@ -101,14 +101,14 @@ export default function ContactPage() {
 
           <div className="rounded-xl border border-white/[0.04] bg-[#0f0f14] p-8">
             <h2 className="text-[18px] font-semibold">Service Coverage</h2>
-            <p className="mt-2 text-[13px] leading-relaxed text-[#5a5a65]">
+            <p className="mt-2 text-[13px] leading-relaxed text-[#686878]">
               We cover London and surrounding areas. If you are unsure whether we service your location, send us a message.
             </p>
             <div className="mt-6 grid grid-cols-2 gap-3">
               {siteConfig.serviceArea.map((area) => (
                 <span
                   key={area}
-                  className="flex items-center gap-2 text-[13px] text-[#8a8a95]"
+                  className="flex items-center gap-2 text-[13px] text-[#9696a3]"
                 >
                   <MarkerPin01 size={14} className="shrink-0 text-[#1d4ed8]" />
                   {area}

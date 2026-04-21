@@ -36,7 +36,7 @@ export default function HeroRequestForm() {
       <div className="overflow-hidden rounded-xl border border-white/[0.06] bg-[#0f0f14]/80 backdrop-blur-md">
         <div className="grid gap-px bg-white/[0.04] sm:grid-cols-2 lg:grid-cols-4">
           <div className="bg-[#0f0f14] p-4 transition hover:bg-[#13131a]">
-            <label htmlFor="hero-location" className="block text-left text-[11px] font-semibold uppercase tracking-wider text-[#5a5a65]">
+            <label htmlFor="hero-location" className="block text-left text-[11px] font-semibold uppercase tracking-wider text-[#686878]">
               Location
             </label>
             <input
@@ -45,11 +45,11 @@ export default function HeroRequestForm() {
               value={postcode}
               onChange={(e) => setPostcode(e.target.value)}
               placeholder="Postcode"
-              className={`mt-1.5 w-full bg-transparent text-[14px] text-white placeholder:text-[#3a3a45] outline-none ${inputFocus}`}
+              className={`mt-1.5 w-full bg-transparent text-[14px] text-white placeholder:text-[#484855] outline-none ${inputFocus}`}
             />
           </div>
           <div className="bg-[#0f0f14] p-4 transition hover:bg-[#13131a]">
-            <label htmlFor="hero-date" className="block text-left text-[11px] font-semibold uppercase tracking-wider text-[#5a5a65]">
+            <label htmlFor="hero-date" className="block text-left text-[11px] font-semibold uppercase tracking-wider text-[#686878]">
               Date
             </label>
             <input
@@ -62,7 +62,7 @@ export default function HeroRequestForm() {
             />
           </div>
           <div className="bg-[#0f0f14] p-4 transition hover:bg-[#13131a]">
-            <label htmlFor="hero-time" className="block text-left text-[11px] font-semibold uppercase tracking-wider text-[#5a5a65]">
+            <label htmlFor="hero-time" className="block text-left text-[11px] font-semibold uppercase tracking-wider text-[#686878]">
               Time
             </label>
             <select
@@ -80,7 +80,7 @@ export default function HeroRequestForm() {
             </select>
           </div>
           <div className="bg-[#0f0f14] p-4 transition hover:bg-[#13131a]">
-            <label htmlFor="hero-service" className="block text-left text-[11px] font-semibold uppercase tracking-wider text-[#5a5a65]">
+            <label htmlFor="hero-service" className="block text-left text-[11px] font-semibold uppercase tracking-wider text-[#686878]">
               Service
             </label>
             <select

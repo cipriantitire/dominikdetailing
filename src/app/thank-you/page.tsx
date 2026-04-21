@@ -15,13 +15,13 @@ export default function ThankYouPage() {
         <h1 className="mt-6 text-[32px] font-bold tracking-tight md:text-[40px]">
           Request Received
         </h1>
-        <p className="mx-auto mt-4 max-w-lg text-[14px] leading-relaxed text-[#5a5a65]">
+        <p className="mx-auto mt-4 max-w-lg text-[14px] leading-relaxed text-[#686878]">
           Thank you for your booking request. We have received your details and will review availability shortly. You will hear back from us within 24 hours to confirm your appointment.
         </p>
 
         <div className="mt-8 w-full rounded-xl border border-white/[0.04] bg-[#0f0f14] p-6 text-left">
           <h2 className="text-[13px] font-semibold">What happens next?</h2>
-          <ol className="mt-4 space-y-3 text-[13px] text-[#5a5a65]">
+          <ol className="mt-4 space-y-3 text-[13px] text-[#686878]">
             <li className="flex items-start gap-3">
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#1d4ed8]/10 text-[11px] font-bold text-[#1d4ed8]">1</span>
               We review your request and check our diary.
@@ -55,9 +55,9 @@ export default function ThankYouPage() {
           </a>
         </div>
 
-        <p className="mt-6 text-[12px] text-[#3a3a45]">
+        <p className="mt-6 text-[12px] text-[#484855]">
           Need to make changes? Call us at{" "}
-          <a href={siteConfig.phoneHref} className="text-[#5a5a65] hover:text-white">
+          <a href={siteConfig.phoneHref} className="text-[#686878] hover:text-white">
             {siteConfig.phone}
           </a>
         </p>

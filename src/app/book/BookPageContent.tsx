@@ -130,8 +130,8 @@ export default function BookPageContent() {
   const minDate = tomorrow.toISOString().split("T")[0];
 
   const inputBase =
-    "w-full rounded-lg border border-white/[0.06] bg-[#0a0a0f] px-3.5 py-2.5 text-[13px] text-white placeholder:text-[#3a3a45] outline-none transition focus:border-[#1d4ed8]/50 focus:ring-1 focus:ring-[#1d4ed8]/20 focus:bg-[#141419]";
-  const labelBase = "block text-[12px] font-semibold text-[#8a8a95]";
+    "w-full rounded-lg border border-white/[0.06] bg-[#0a0a0f] px-3.5 py-2.5 text-[13px] text-white placeholder:text-[#484855] outline-none transition focus:border-[#1d4ed8]/50 focus:ring-1 focus:ring-[#1d4ed8]/20 focus:bg-[#141419]";
+  const labelBase = "block text-[12px] font-semibold text-[#9696a3]";
   const errorBase = "mt-1 text-[11px] text-[#dc2626]";
 
   if (submitSuccess) {
@@ -145,7 +145,7 @@ export default function BookPageContent() {
           <h1 className="mt-6 text-[32px] font-bold tracking-tight md:text-[40px]">
             Request Received
           </h1>
-          <p className="mt-4 text-[14px] leading-relaxed text-[#5a5a65]">
+          <p className="mt-4 text-[14px] leading-relaxed text-[#686878]">
             Thank you. We have received your booking request and will review it shortly. You will hear back from us within 24 hours to confirm your appointment.
           </p>
           <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -165,9 +165,9 @@ export default function BookPageContent() {
               Message on WhatsApp
             </a>
           </div>
-          <p className="mt-6 text-[12px] text-[#3a3a45]">
+          <p className="mt-6 text-[12px] text-[#484855]">
             Need to make changes? Call us at{" "}
-            <a href={siteConfig.phoneHref} className="text-[#5a5a65] hover:text-white">
+            <a href={siteConfig.phoneHref} className="text-[#686878] hover:text-white">
               {siteConfig.phone}
             </a>
           </p>
@@ -184,7 +184,7 @@ export default function BookPageContent() {
         <div className="mb-8">
           <Link
             href="/"
-            className="inline-flex items-center gap-1 text-[13px] text-[#5a5a65] transition hover:text-white"
+            className="inline-flex items-center gap-1 text-[13px] text-[#686878] transition hover:text-white"
           >
             <ArrowRight size={14} className="rotate-180" />
             Back to home
@@ -195,7 +195,7 @@ export default function BookPageContent() {
           <h1 className="text-[32px] font-bold tracking-tight md:text-[48px]">
             Schedule Your <span className="text-[#1d4ed8]">Appointment</span>
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed text-[#5a5a65]">
+          <p className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed text-[#686878]">
             Choose your preferred date, time, and service. We&apos;ll confirm your appointment within 24 hours.
           </p>
         </div>
@@ -204,7 +204,7 @@ export default function BookPageContent() {
           {/* Form */}
           <div className="rounded-xl border border-white/[0.04] bg-[#0f0f14] p-5 md:p-8">
             <h2 className="text-[16px] font-semibold">Book Your Service</h2>
-            <p className="mt-1 text-[13px] text-[#5a5a65]">
+            <p className="mt-1 text-[13px] text-[#686878]">
               Fill out the form to schedule your appointment
             </p>
 
@@ -526,7 +526,7 @@ export default function BookPageContent() {
                 )}
               </button>
 
-              <p className="text-center text-[11px] text-[#3a3a45]">
+              <p className="text-center text-[11px] text-[#484855]">
                 This is a booking request, not an instant confirmation. The owner will review and confirm your appointment.
               </p>
             </form>
@@ -536,13 +536,13 @@ export default function BookPageContent() {
           <div className="space-y-5">
             <div className="rounded-xl border border-white/[0.04] bg-[#0f0f14] p-5">
               <h3 className="text-[13px] font-semibold">Contact Information</h3>
-              <p className="mt-0.5 text-[12px] text-[#5a5a65]">Multiple ways to reach us</p>
+              <p className="mt-0.5 text-[12px] text-[#686878]">Multiple ways to reach us</p>
               <div className="mt-4 space-y-4">
                 <div className="flex items-start gap-3">
                   <Phone size={15} className="mt-0.5 shrink-0 text-[#1d4ed8]" />
                   <div>
                     <p className="text-[12px] font-semibold">Phone &amp; SMS</p>
-                    <p className="text-[11px] text-[#5a5a65]">Call or message on WhatsApp</p>
+                    <p className="text-[11px] text-[#686878]">Call or message on WhatsApp</p>
                     <a href={siteConfig.phoneHref} className="text-[13px] text-white hover:underline">
                       {siteConfig.phone}
                     </a>
@@ -552,7 +552,7 @@ export default function BookPageContent() {
                   <Mail01 size={15} className="mt-0.5 shrink-0 text-[#1d4ed8]" />
                   <div>
                     <p className="text-[12px] font-semibold">Email</p>
-                    <p className="text-[11px] text-[#5a5a65]">Email us your questions</p>
+                    <p className="text-[11px] text-[#686878]">Email us your questions</p>
                     <a href={`mailto:${siteConfig.email}`} className="text-[13px] text-white hover:underline">
                       {siteConfig.email}
                     </a>
@@ -562,8 +562,8 @@ export default function BookPageContent() {
                   <Clock size={15} className="mt-0.5 shrink-0 text-[#1d4ed8]" />
                   <div>
                     <p className="text-[12px] font-semibold">Business Hours</p>
-                    <p className="text-[11px] text-[#8a8a95]">{siteConfig.hours.weekday}</p>
-                    <p className="text-[11px] text-[#8a8a95]">{siteConfig.hours.saturday}</p>
+                    <p className="text-[11px] text-[#9696a3]">{siteConfig.hours.weekday}</p>
+                    <p className="text-[11px] text-[#9696a3]">{siteConfig.hours.saturday}</p>
                     <p className="text-[11px] text-[#dc2626]">{siteConfig.hours.sunday}</p>
                   </div>
                 </div>
@@ -598,7 +598,7 @@ export default function BookPageContent() {
                   "Top-notch quality products used",
                   "Loyalty rewards program",
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-[12px] text-[#8a8a95]">
+                  <li key={item} className="flex items-center gap-2 text-[12px] text-[#9696a3]">
                     <CheckVerified02 size={14} className="shrink-0 text-[#22c55e]" />
                     {item}
                   </li>
@@ -614,7 +614,7 @@ export default function BookPageContent() {
               <p className="mt-3 text-[13px] font-semibold">
                 Get 20% off your first service when you book online
               </p>
-              <p className="mt-2 text-[12px] text-[#5a5a65]">
+              <p className="mt-2 text-[12px] text-[#686878]">
                 Use code: <span className="font-bold text-[#c5a059]">FIRST20</span>
               </p>
             </div>

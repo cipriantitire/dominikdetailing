@@ -20,7 +20,7 @@ export default function AboutPage() {
           <h1 className="mt-3 text-[32px] font-bold tracking-tight md:text-[48px]">
             About <span className="text-[#1d4ed8]">Dominik Detailing</span>
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed text-[#5a5a65]">
+          <p className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed text-[#686878]">
             Premium mobile car detailing built on attention to detail and honest service.
           </p>
         </div>
@@ -39,24 +39,24 @@ export default function AboutPage() {
             <h2 className="text-[24px] font-bold tracking-tight md:text-[32px]">
               Mobile detailing done properly
             </h2>
-            <p className="mt-5 text-[14px] leading-relaxed text-[#5a5a65]">
+            <p className="mt-5 text-[14px] leading-relaxed text-[#686878]">
               Dominik Detailing was founded on a simple belief: every car deserves to look its best, and every owner deserves a service they can trust. We bring professional-grade equipment, premium products, and years of experience directly to your door.
             </p>
-            <p className="mt-4 text-[14px] leading-relaxed text-[#5a5a65]">
+            <p className="mt-4 text-[14px] leading-relaxed text-[#686878]">
               Whether you need a quick maintenance wash to keep your daily driver fresh, or a full paint correction and ceramic coating to protect your pride and joy, we treat every vehicle with the same meticulous care.
             </p>
             <div className="mt-8 grid grid-cols-3 gap-6">
               <div className="text-center">
                 <p className="text-[28px] font-bold text-[#1d4ed8]">5+</p>
-                <p className="mt-1 text-[11px] uppercase tracking-wider text-[#5a5a65]">Years Experience</p>
+                <p className="mt-1 text-[11px] uppercase tracking-wider text-[#686878]">Years Experience</p>
               </div>
               <div className="text-center">
                 <p className="text-[28px] font-bold text-[#1d4ed8]">500+</p>
-                <p className="mt-1 text-[11px] uppercase tracking-wider text-[#5a5a65]">Cars Detailed</p>
+                <p className="mt-1 text-[11px] uppercase tracking-wider text-[#686878]">Cars Detailed</p>
               </div>
               <div className="text-center">
                 <p className="text-[28px] font-bold text-[#1d4ed8]">100%</p>
-                <p className="mt-1 text-[11px] uppercase tracking-wider text-[#5a5a65]">Satisfaction</p>
+                <p className="mt-1 text-[11px] uppercase tracking-wider text-[#686878]">Satisfaction</p>
               </div>
             </div>
           </div>
@@ -79,7 +79,7 @@ export default function AboutPage() {
           ].map((item) => (
             <div key={item.title} className="rounded-xl border border-white/[0.04] bg-[#0f0f14] p-6">
               <h3 className="text-[16px] font-semibold">{item.title}</h3>
-              <p className="mt-3 text-[13px] leading-relaxed text-[#5a5a65]">{item.text}</p>
+              <p className="mt-3 text-[13px] leading-relaxed text-[#686878]">{item.text}</p>
             </div>
           ))}
         </div>

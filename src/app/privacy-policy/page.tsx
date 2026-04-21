@@ -14,7 +14,7 @@ export default function PrivacyPolicyPage() {
             Privacy Policy
           </h1>
         </div>
-        <div className="mt-8 space-y-6 text-[13px] leading-relaxed text-[#5a5a65]">
+        <div className="mt-8 space-y-6 text-[13px] leading-relaxed text-[#686878]">
           <p>
             Dominik Detailing is committed to protecting your privacy. This policy explains how we collect, use, and safeguard your personal information when you use our website and services.
           </p>

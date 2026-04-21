@@ -62,7 +62,7 @@ export default function GalleryPage() {
           <h1 className="mt-3 text-[32px] font-bold tracking-tight md:text-[48px]">
             Our <span className="text-[#1d4ed8]">Work</span>
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed text-[#5a5a65]">
+          <p className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed text-[#686878]">
             Real results from real jobs. Every vehicle receives the same meticulous attention.
           </p>
         </div>

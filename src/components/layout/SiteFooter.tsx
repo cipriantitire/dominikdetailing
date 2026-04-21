@@ -34,9 +34,9 @@ export default function SiteFooter() {
                   height={28}
                 />
               </span>
-              Dominik<span className="font-light text-[#5a5a65]">Detailing</span>
+              Dominik<span className="font-light text-[#686878]">Detailing</span>
             </Link>
-            <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-[#5a5a65]">
+            <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-[#686878]">
               Premium mobile car detailing across London and surrounding areas. We bring the studio to you.
             </p>
           </div>
@@ -50,7 +50,7 @@ export default function SiteFooter() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-[13px] text-[#5a5a65] transition hover:text-[#8a8a95] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
+                    className="text-[13px] text-[#686878] transition hover:text-[#9696a3] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
                   >
                     {link.label}
                   </Link>
@@ -67,7 +67,7 @@ export default function SiteFooter() {
               <li>
                 <a
                   href={siteConfig.phoneHref}
-                  className="flex items-center gap-2 text-[13px] text-[#5a5a65] transition hover:text-[#8a8a95] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
+                  className="flex items-center gap-2 text-[13px] text-[#686878] transition hover:text-[#9696a3] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
                 >
                   <Phone size={15} />
                   {siteConfig.phone}
@@ -76,13 +76,13 @@ export default function SiteFooter() {
               <li>
                 <a
                   href={`mailto:${siteConfig.email}`}
-                  className="flex items-center gap-2 text-[13px] text-[#5a5a65] transition hover:text-[#8a8a95] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
+                  className="flex items-center gap-2 text-[13px] text-[#686878] transition hover:text-[#9696a3] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
                 >
                   <Mail01 size={15} />
                   {siteConfig.email}
                 </a>
               </li>
-              <li className="flex items-center gap-2 text-[13px] text-[#5a5a65]">
+              <li className="flex items-center gap-2 text-[13px] text-[#686878]">
                 <MarkerPin01 size={15} />
                 {siteConfig.address}
               </li>
@@ -100,7 +100,7 @@ export default function SiteFooter() {
                 href={siteConfig.social.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[13px] text-[#5a5a65] transition hover:text-[#8a8a95] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
+                className="text-[13px] text-[#686878] transition hover:text-[#9696a3] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
               >
                 Instagram
               </a>
@@ -108,7 +108,7 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-14 border-t border-white/[0.04] pt-6 text-center text-[11px] uppercase tracking-wider text-[#3a3a45]">
+        <div className="mt-14 border-t border-white/[0.04] pt-6 text-center text-[11px] uppercase tracking-wider text-[#484855]">
           &copy; {new Date().getFullYear()} Dominik Detailing. All rights reserved.
         </div>
       </div>

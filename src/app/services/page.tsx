@@ -17,7 +17,7 @@ export default function ServicesPage() {
           <h1 className="mt-3 text-[32px] font-bold tracking-tight md:text-[48px]">
             Our <span className="text-[#1d4ed8]">Services</span>
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-[14px] leading-relaxed text-[#5a5a65]">
+          <p className="mx-auto mt-4 max-w-2xl text-[14px] leading-relaxed text-[#686878]">
             Every service is performed to the same high standard, whether it is a quick maintenance wash or a full paint correction.
           </p>
         </div>
@@ -44,10 +44,10 @@ export default function ServicesPage() {
                     From &pound;{service.startingPrice}
                   </span>
                 </div>
-                <p className="mt-2 text-[13px] text-[#5a5a65]">{service.shortDescription}</p>
+                <p className="mt-2 text-[13px] text-[#686878]">{service.shortDescription}</p>
                 <ul className="mt-4 space-y-2">
                   {service.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2 text-[13px] text-[#8a8a95]">
+                    <li key={feature} className="flex items-start gap-2 text-[13px] text-[#9696a3]">
                       <CheckVerified02 size={15} className="mt-0.5 shrink-0 text-[#22c55e]" />
                       {feature}
                     </li>
@@ -71,7 +71,7 @@ export default function ServicesPage() {
           <h2 className="text-center text-[28px] font-bold tracking-tight md:text-[36px]">
             Extras &amp; Add-Ons
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-center text-[14px] text-[#5a5a65]">
+          <p className="mx-auto mt-4 max-w-xl text-center text-[14px] text-[#686878]">
             Add these to any service to customise your detail.
           </p>
           <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
