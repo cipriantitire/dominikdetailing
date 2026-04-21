@@ -91,7 +91,7 @@ export default function AboutPage() {
           <div className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/book"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-8 py-3.5 text-[13px] font-bold text-white transition hover:bg-[#1e40af]"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-8 py-3.5 text-[13px] font-bold text-white transition hover:bg-[#1e40af] active:scale-[0.98]"
             >
               Request a Quote
               <ArrowRight size={16} />

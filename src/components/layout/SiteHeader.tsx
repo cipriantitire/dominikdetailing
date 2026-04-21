@@ -30,17 +30,17 @@ export default function SiteHeader() {
           <div className="flex items-center gap-5">
             <a
               href={siteConfig.phoneHref}
-              className="flex items-center gap-1.5 transition hover:text-[#8a8a95]"
+              className="hidden items-center gap-1.5 transition hover:text-[#8a8a95] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded md:flex"
             >
               <Phone size={12} />
-              <span className="hidden sm:inline">{siteConfig.phone}</span>
+              <span>{siteConfig.phone}</span>
             </a>
             <span className="flex items-center gap-1.5">
               <MarkerPin01 size={12} />
-              <span className="hidden sm:inline">{siteConfig.address}</span>
+              <span>{siteConfig.address}</span>
             </span>
           </div>
-          <span className="hidden md:block">
+          <span>
             Mon &ndash; Sat: 8:00 &ndash; 18:00
           </span>
         </div>
@@ -51,7 +51,7 @@ export default function SiteHeader() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
           <Link
             href="/"
-            className="flex items-center gap-2.5 text-[15px] font-semibold tracking-tight text-white"
+            className="flex items-center gap-2.5 text-[15px] font-semibold tracking-tight text-white focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded-lg"
           >
             <span className="flex h-8 w-8 items-center justify-center">
               <Image
@@ -61,7 +61,7 @@ export default function SiteHeader() {
                 height={28}
               />
             </span>
-            <span className="hidden sm:inline">
+            <span>
               Dominik<span className="font-light text-[#5a5a65]">Detailing</span>
             </span>
           </Link>
@@ -72,7 +72,7 @@ export default function SiteHeader() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-[13px] font-medium text-[#8a8a95] transition hover:text-white"
+                className="text-[13px] font-medium text-[#8a8a95] transition hover:text-white focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
               >
                 {link.label}
               </Link>
@@ -82,62 +82,76 @@ export default function SiteHeader() {
           <div className="hidden items-center gap-3 md:flex">
             <a
               href={siteConfig.phoneHref}
-              className="flex items-center gap-2 rounded-lg border border-[#22c55e]/25 px-4 py-2 text-[13px] font-semibold text-[#22c55e] transition hover:border-[#22c55e]/50 hover:bg-[#22c55e]/5"
+              className="flex items-center gap-2 rounded-lg border border-[#22c55e]/25 px-4 py-2 text-[13px] font-semibold text-[#22c55e] transition hover:border-[#22c55e]/50 hover:bg-[#22c55e]/5 focus-visible:ring-1 focus-visible:ring-[#22c55e]/40 outline-none"
             >
               <Phone size={16} />
               Call
             </a>
             <Link
               href="/book"
-              className="rounded-lg bg-[#1d4ed8] px-5 py-2 text-[13px] font-semibold text-white transition hover:bg-[#1e40af]"
+              className="rounded-lg bg-[#1d4ed8] px-5 py-2 text-[13px] font-semibold text-white transition hover:bg-[#1e40af] active:scale-[0.98] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none"
             >
               Request Booking
             </Link>
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-white transition hover:bg-white/5 md:hidden"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
-          >
-            {menuOpen ? <XClose size={22} /> : <Menu01 size={22} />}
-          </button>
+          {/* Mobile actions */}
+          <div className="flex items-center gap-3 md:hidden">
+            <a
+              href={siteConfig.phoneHref}
+              className={`flex items-center gap-1.5 rounded-lg border border-[#22c55e]/25 px-3 py-2 text-[13px] font-semibold text-[#22c55e] transition-opacity duration-300 hover:border-[#22c55e]/50 hover:bg-[#22c55e]/5 ${
+                menuOpen ? "pointer-events-none opacity-0" : "opacity-100"
+              }`}
+            >
+              <Phone size={16} className="transition-opacity duration-300" />
+              <span className="transition-opacity duration-300">Call</span>
+            </a>
+            <button
+              className="flex h-10 w-10 items-center justify-center rounded-lg text-white transition hover:bg-white/5"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle menu"
+              aria-expanded={menuOpen}
+            >
+              {menuOpen ? <XClose size={22} /> : <Menu01 size={22} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile menu */}
-        {menuOpen && (
-          <div className="border-t border-white/[0.04] bg-[#09090d] px-4 pb-6 md:hidden">
-            <nav className="flex flex-col gap-0.5 pt-3">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="rounded-lg px-3 py-3 text-[14px] font-medium text-[#8a8a95] transition hover:bg-white/[0.03] hover:text-white"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-            <div className="mt-4 flex flex-col gap-3">
-              <a
-                href={siteConfig.phoneHref}
-                className="flex items-center justify-center gap-2 rounded-lg border border-[#22c55e]/25 px-4 py-3 text-[13px] font-semibold text-[#22c55e]"
-              >
-                <Phone size={16} />
-                Call {siteConfig.phone}
-              </a>
+        <div
+          className={`border-t border-white/[0.04] bg-[#09090d] px-4 md:hidden overflow-hidden transition-all duration-300 ease-out ${
+            menuOpen ? "max-h-[500px] opacity-100 pb-6" : "max-h-0 opacity-0 pb-0"
+          }`}
+        >
+          <nav className="flex flex-col gap-0.5 pt-3">
+            {navLinks.map((link) => (
               <Link
-                href="/book"
-                className="rounded-lg bg-[#1d4ed8] px-4 py-3 text-center text-[13px] font-semibold text-white"
+                key={link.href}
+                href={link.href}
+                className="rounded-lg px-3 py-3 text-[14px] font-medium text-[#8a8a95] transition hover:bg-white/[0.03] hover:text-white focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none"
                 onClick={() => setMenuOpen(false)}
               >
-                Request Booking
+                {link.label}
               </Link>
-            </div>
+            ))}
+          </nav>
+          <div className="mt-4 flex flex-col gap-3">
+            <a
+              href={siteConfig.phoneHref}
+              className="flex items-center justify-center gap-2 rounded-lg border border-[#22c55e]/25 px-4 py-3 text-[13px] font-semibold text-[#22c55e] transition hover:border-[#22c55e]/50 hover:bg-[#22c55e]/5"
+            >
+              <Phone size={16} />
+              Call {siteConfig.phone}
+            </a>
+            <Link
+              href="/book"
+              className="rounded-lg bg-[#1d4ed8] px-4 py-3 text-center text-[13px] font-semibold text-white transition hover:bg-[#1e40af]"
+              onClick={() => setMenuOpen(false)}
+            >
+              Request Booking
+            </Link>
           </div>
-        )}
+        </div>
       </header>
     </>
   );

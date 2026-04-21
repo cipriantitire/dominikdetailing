@@ -81,7 +81,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-t from-[#09090d] via-[#09090d]/30 to-[#09090d]/60" />
         </div>
 
-        <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-16 pt-28 text-center md:px-6 md:pb-24 md:pt-36">
+        <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-16 pt-16 text-center md:px-6 md:pb-24 md:pt-36">
           <span className="inline-flex items-center gap-2 rounded-full border border-[#c5a059]/30 bg-[#c5a059]/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
             <Star06 size={14} />
             Limited Time: 20% OFF First Service
@@ -136,10 +136,10 @@ export default function Home() {
 
           <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {serviceTiers.map((service) => (
-              <article
-                key={service.id}
-                className="group relative flex flex-col overflow-hidden rounded-xl border border-white/[0.04] bg-[#0f0f14] transition hover:border-white/[0.08]"
-              >
+                <article
+                  key={service.id}
+                  className="group relative flex flex-col overflow-hidden rounded-xl border border-white/[0.04] bg-[#0f0f14] transition duration-300 hover:border-white/[0.08] hover:-translate-y-0.5"
+                >
                 <div className="relative h-52 overflow-hidden">
                   <Image
                     src={service.image}
@@ -172,12 +172,12 @@ export default function Home() {
                     ))}
                   </ul>
                   <div className="mt-auto pt-5">
-                    <Link
-                      href={`/book?service=${service.id}`}
-                      className="block rounded-lg bg-[#1d4ed8] py-2.5 text-center text-[13px] font-semibold text-white transition hover:bg-[#1e40af]"
-                    >
-                      Request Booking
-                    </Link>
+          <Link
+            href={`/book?service=${service.id}`}
+            className="block rounded-lg bg-[#1d4ed8] py-2.5 text-center text-[13px] font-semibold text-white transition hover:bg-[#1e40af] active:scale-[0.98]"
+          >
+            Request Booking
+          </Link>
                   </div>
                 </div>
               </article>
@@ -227,7 +227,7 @@ export default function Home() {
               </p>
               <Link
                 href="/gallery"
-                className="mt-6 inline-flex items-center gap-2 text-[13px] font-semibold text-[#1d4ed8] transition hover:text-[#3b6cb7]"
+                className="mt-6 inline-flex items-center gap-2 text-[13px] font-semibold text-[#1d4ed8] transition hover:text-[#3b6cb7] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
               >
                 View full gallery
                 <ArrowRight size={16} />
@@ -422,16 +422,17 @@ export default function Home() {
             {faqs.map((faq, i) => (
               <details
                 key={i}
-                className="group rounded-xl border border-white/[0.04] bg-[#0f0f14] open:border-white/[0.08]"
+                className="group rounded-xl border border-white/[0.04] bg-[#0f0f14] transition open:border-white/[0.08]"
               >
-                <summary className="flex cursor-pointer items-center justify-between p-5 text-[14px] font-semibold text-white transition hover:bg-[#141419]">
+                <summary className="flex cursor-pointer items-center justify-between p-5 text-[14px] font-semibold text-white transition hover:bg-[#141419] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded-xl">
                   {faq.question}
                   <svg
-                    className="h-4 w-4 shrink-0 text-[#5a5a65] transition group-open:rotate-180"
+                    className="h-4 w-4 shrink-0 text-[#5a5a65] transition-transform duration-300 group-open:rotate-180"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                     strokeWidth={2}
+                    aria-hidden="true"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
@@ -457,7 +458,7 @@ export default function Home() {
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/book"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-8 py-3.5 text-[13px] font-bold text-white transition hover:bg-[#1e40af]"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-8 py-3.5 text-[13px] font-bold text-white transition hover:bg-[#1e40af] active:scale-[0.98]"
             >
               Request Booking
               <ArrowRight size={16} />

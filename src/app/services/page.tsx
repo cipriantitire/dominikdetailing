@@ -56,7 +56,7 @@ export default function ServicesPage() {
                 <div className="mt-auto pt-6">
                   <Link
                     href={`/book?service=${service.id}`}
-                    className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-5 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#1e40af]"
+                    className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-5 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#1e40af] active:scale-[0.98]"
                   >
                     Request Booking
                     <ArrowRight size={14} />

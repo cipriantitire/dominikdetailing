@@ -65,7 +65,7 @@ export default function ContactPage() {
                     {item.href ? (
                       <a
                         href={item.href}
-                        className="mt-0.5 whitespace-pre-line text-[13px] text-[#5a5a65] transition hover:text-[#8a8a95]"
+                        className="mt-0.5 whitespace-pre-line text-[13px] text-[#5a5a65] transition hover:text-[#8a8a95] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
                       >
                         {item.value}
                       </a>
@@ -84,14 +84,14 @@ export default function ContactPage() {
                 href={siteConfig.whatsapp}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg bg-[#22c55e] px-5 py-2.5 text-[13px] font-semibold text-[#09090d] transition hover:bg-[#16a34a]"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#22c55e] px-5 py-2.5 text-[13px] font-semibold text-[#09090d] transition hover:bg-[#16a34a] active:scale-[0.98] focus-visible:ring-1 focus-visible:ring-[#22c55e]/40 outline-none"
               >
                 <MessageChatSquare size={16} />
                 WhatsApp
               </a>
               <a
                 href={siteConfig.phoneHref}
-                className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-5 py-2.5 text-[13px] font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.03]"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-5 py-2.5 text-[13px] font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.03] active:scale-[0.98] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none"
               >
                 <Phone size={16} />
                 Call Now
@@ -118,7 +118,7 @@ export default function ContactPage() {
             <div className="mt-8">
               <Link
                 href="/book"
-                className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-6 py-3 text-[13px] font-bold text-white transition hover:bg-[#1e40af]"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-6 py-3 text-[13px] font-bold text-white transition hover:bg-[#1e40af] active:scale-[0.98]"
               >
                 Book a Service
                 <ArrowRight size={14} />

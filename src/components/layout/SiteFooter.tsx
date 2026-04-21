@@ -24,7 +24,7 @@ export default function SiteFooter() {
           <div>
             <Link
               href="/"
-              className="flex items-center gap-2 text-[15px] font-semibold tracking-tight text-white"
+              className="flex items-center gap-2 text-[15px] font-semibold tracking-tight text-white focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded-lg"
             >
               <span className="flex h-8 w-8 items-center justify-center">
                 <Image
@@ -50,7 +50,7 @@ export default function SiteFooter() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-[13px] text-[#5a5a65] transition hover:text-[#8a8a95]"
+                    className="text-[13px] text-[#5a5a65] transition hover:text-[#8a8a95] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
                   >
                     {link.label}
                   </Link>
@@ -67,7 +67,7 @@ export default function SiteFooter() {
               <li>
                 <a
                   href={siteConfig.phoneHref}
-                  className="flex items-center gap-2 text-[13px] text-[#5a5a65] transition hover:text-[#8a8a95]"
+                  className="flex items-center gap-2 text-[13px] text-[#5a5a65] transition hover:text-[#8a8a95] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
                 >
                   <Phone size={15} />
                   {siteConfig.phone}
@@ -76,7 +76,7 @@ export default function SiteFooter() {
               <li>
                 <a
                   href={`mailto:${siteConfig.email}`}
-                  className="flex items-center gap-2 text-[13px] text-[#5a5a65] transition hover:text-[#8a8a95]"
+                  className="flex items-center gap-2 text-[13px] text-[#5a5a65] transition hover:text-[#8a8a95] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
                 >
                   <Mail01 size={15} />
                   {siteConfig.email}
@@ -92,7 +92,7 @@ export default function SiteFooter() {
                 href={siteConfig.whatsapp}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[13px] text-[#22c55e] transition hover:underline"
+                className="text-[13px] text-[#22c55e] transition hover:underline focus-visible:ring-1 focus-visible:ring-[#22c55e]/40 outline-none rounded"
               >
                 WhatsApp
               </a>
@@ -100,7 +100,7 @@ export default function SiteFooter() {
                 href={siteConfig.social.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[13px] text-[#5a5a65] transition hover:text-[#8a8a95]"
+                className="text-[13px] text-[#5a5a65] transition hover:text-[#8a8a95] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
               >
                 Instagram
               </a>

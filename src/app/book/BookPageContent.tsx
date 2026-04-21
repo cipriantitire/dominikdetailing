@@ -130,7 +130,7 @@ export default function BookPageContent() {
   const minDate = tomorrow.toISOString().split("T")[0];
 
   const inputBase =
-    "w-full rounded-lg border border-white/[0.06] bg-[#0a0a0f] px-3.5 py-2.5 text-[13px] text-white placeholder:text-[#3a3a45] outline-none transition focus:border-[#1d4ed8]/50 focus:ring-1 focus:ring-[#1d4ed8]/20";
+    "w-full rounded-lg border border-white/[0.06] bg-[#0a0a0f] px-3.5 py-2.5 text-[13px] text-white placeholder:text-[#3a3a45] outline-none transition focus:border-[#1d4ed8]/50 focus:ring-1 focus:ring-[#1d4ed8]/20 focus:bg-[#141419]";
   const labelBase = "block text-[12px] font-semibold text-[#8a8a95]";
   const errorBase = "mt-1 text-[11px] text-[#dc2626]";
 
@@ -455,14 +455,19 @@ export default function BookPageContent() {
                       className={`${inputBase} w-full pr-14 disabled:opacity-40`}
                     />
 
-                    <label className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex cursor-pointer items-center">
+                    <label
+                      htmlFor="keyCollectionSame"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex cursor-pointer items-center"
+                      aria-label="Use car location as key collection address"
+                      title="Toggle same as car location"
+                    >
                       <input
                         id="keyCollectionSame"
                         type="checkbox"
                         {...register("keyCollectionSame")}
                         className="peer sr-only"
                       />
-                      <div className="peer h-6 w-11 rounded-full bg-[#1a1a20] relative after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#22c55e] peer-checked:after:translate-x-full" />
+                      <div className="peer h-6 w-11 rounded-full bg-[#1a1a20] relative after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#22c55e] peer-checked:after:translate-x-full peer-focus-visible:ring-2 peer-focus-visible:ring-[#1d4ed8]/40" />
                     </label>
                   </div>
                 </div>

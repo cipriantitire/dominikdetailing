@@ -52,23 +52,26 @@ const galleryItems = [
 
 export default function GalleryPage() {
   return (
-    <div className="min-h-screen bg-[#090909] text-white">
+    <div className="min-h-screen bg-[#09090d] text-white">
       <SiteHeader />
-      <main className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-20">
+      <main className="mx-auto max-w-7xl px-4 py-20 md:px-6 md:py-24">
         <div className="text-center">
-          <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
-            Our <span className="text-[#3b82f6]">Work</span>
+          <span className="text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
+            Gallery
+          </span>
+          <h1 className="mt-3 text-[32px] font-bold tracking-tight md:text-[48px]">
+            Our <span className="text-[#1d4ed8]">Work</span>
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-[#a3a3a3]">
+          <p className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed text-[#5a5a65]">
             Real results from real jobs. Every vehicle receives the same meticulous attention.
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {galleryItems.map((item, i) => (
             <div
               key={i}
-              className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-white/5 bg-[#111]"
+              className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-white/[0.04] bg-[#0f0f14]"
             >
               <Image
                 src={item.src}
@@ -79,10 +82,10 @@ export default function GalleryPage() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
               <div className="absolute bottom-0 left-0 right-0 translate-y-2 p-4 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                <span className="rounded bg-[#3b82f6]/20 px-2 py-0.5 text-xs font-medium text-[#3b82f6]">
+                <span className="rounded bg-[#1d4ed8]/10 px-2 py-0.5 text-[11px] font-medium text-[#1d4ed8]">
                   {item.category}
                 </span>
-                <p className="mt-1 text-sm font-medium">{item.alt}</p>
+                <p className="mt-1 text-[13px] font-medium">{item.alt}</p>
               </div>
             </div>
           ))}
