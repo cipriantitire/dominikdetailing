@@ -7,8 +7,8 @@ export default function BookPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-[#090909] text-white">
-          <div className="text-sm text-[#a3a3a3]">Loading...</div>
+        <div className="flex min-h-screen items-center justify-center bg-[#09090d] text-white">
+          <div className="text-sm text-[#5a5a65]">Loading...</div>
         </div>
       }
     >

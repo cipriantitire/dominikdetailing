@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { serviceTiers } from "@/config/services";
+import { serviceTiers, timeWindows } from "@/config/services";
 
 export default function HeroRequestForm() {
   const router = useRouter();
@@ -28,77 +28,78 @@ export default function HeroRequestForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto grid max-w-4xl gap-px overflow-hidden rounded-lg bg-white/10 sm:grid-cols-2 lg:grid-cols-4"
+      className="mx-auto w-full max-w-4xl overflow-hidden rounded-xl border border-white/[0.06] bg-[#0f0f14]/80 backdrop-blur-md"
     >
-      <div className="bg-[#f5f5f5] p-4">
-        <label htmlFor="hero-location" className="block text-xs font-semibold text-[#111]">
-          Location
-        </label>
-        <input
-          id="hero-location"
-          type="text"
-          value={postcode}
-          onChange={(e) => setPostcode(e.target.value)}
-          placeholder="Enter your address or postcode"
-          className="mt-1 w-full bg-transparent text-sm text-[#111] placeholder:text-[#999] outline-none"
-        />
+      <div className="grid gap-px bg-white/[0.04] sm:grid-cols-2 lg:grid-cols-4">
+        <div className="bg-[#0f0f14] p-4">
+          <label htmlFor="hero-location" className="block text-[11px] font-semibold uppercase tracking-wider text-[#5a5a65]">
+            Location
+          </label>
+          <input
+            id="hero-location"
+            type="text"
+            value={postcode}
+            onChange={(e) => setPostcode(e.target.value)}
+            placeholder="Postcode"
+            className="mt-1.5 w-full bg-transparent text-[14px] text-white placeholder:text-[#3a3a45] outline-none"
+          />
+        </div>
+        <div className="bg-[#0f0f14] p-4">
+          <label htmlFor="hero-date" className="block text-[11px] font-semibold uppercase tracking-wider text-[#5a5a65]">
+            Date
+          </label>
+          <input
+            id="hero-date"
+            type="date"
+            min={minDate}
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="mt-1.5 w-full bg-transparent text-[14px] text-white outline-none"
+          />
+        </div>
+        <div className="bg-[#0f0f14] p-4">
+          <label htmlFor="hero-time" className="block text-[11px] font-semibold uppercase tracking-wider text-[#5a5a65]">
+            Time
+          </label>
+          <select
+            id="hero-time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className="mt-1.5 w-full bg-transparent text-[14px] text-white outline-none"
+          >
+            <option value="" className="bg-[#0f0f14]">Preferred time</option>
+            {timeWindows.map((window) => (
+              <option key={window} value={window} className="bg-[#0f0f14]">
+                {window}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="bg-[#0f0f14] p-4">
+          <label htmlFor="hero-service" className="block text-[11px] font-semibold uppercase tracking-wider text-[#5a5a65]">
+            Service
+          </label>
+          <select
+            id="hero-service"
+            value={service}
+            onChange={(e) => setService(e.target.value)}
+            className="mt-1.5 w-full bg-transparent text-[14px] text-white outline-none"
+          >
+            <option value="" className="bg-[#0f0f14]">Select service</option>
+            {serviceTiers.map((t) => (
+              <option key={t.id} value={t.id} className="bg-[#0f0f14]">
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
-      <div className="bg-[#f5f5f5] p-4">
-        <label htmlFor="hero-date" className="block text-xs font-semibold text-[#111]">
-          Date
-        </label>
-        <input
-          id="hero-date"
-          type="date"
-          min={minDate}
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          placeholder="Select a preferred date"
-          className="mt-1 w-full bg-transparent text-sm text-[#111] placeholder:text-[#999] outline-none"
-        />
-      </div>
-      <div className="bg-[#f5f5f5] p-4">
-        <label htmlFor="hero-time" className="block text-xs font-semibold text-[#111]">
-          Time
-        </label>
-        <select
-          id="hero-time"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          className="mt-1 w-full bg-transparent text-sm text-[#111] outline-none"
-        >
-          <option value="">Select a preferred time</option>
-          <option value="morning">Morning (8am - 12pm)</option>
-          <option value="afternoon">Afternoon (12pm - 4pm)</option>
-          <option value="evening">Evening (4pm - 6pm)</option>
-        </select>
-      </div>
-      <div className="bg-[#f5f5f5] p-4">
-        <label htmlFor="hero-service" className="block text-xs font-semibold text-[#111]">
-          Service
-        </label>
-        <select
-          id="hero-service"
-          value={service}
-          onChange={(e) => setService(e.target.value)}
-          className="mt-1 w-full bg-transparent text-sm text-[#111] outline-none"
-        >
-          <option value="">Choose a service</option>
-          {serviceTiers.map((t) => (
-            <option key={t.id} value={t.id}>
-              {t.name}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="sm:col-span-2 lg:col-span-4">
-        <button
-          type="submit"
-          className="w-full bg-[#3b82f6] py-4 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-[#2563eb]"
-        >
-          Book Now
-        </button>
-      </div>
+      <button
+        type="submit"
+        className="w-full bg-[#1d4ed8] py-3.5 text-[13px] font-bold uppercase tracking-widest text-white transition hover:bg-[#1e40af]"
+      >
+        Request Booking
+      </button>
     </form>
   );
 }

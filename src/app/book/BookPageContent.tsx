@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Image from "next/image";
@@ -11,29 +11,26 @@ import { serviceTiers, serviceExtras, timeWindows } from "@/config/services";
 import { siteConfig } from "@/config/site";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
+import { bookingSchema } from "@/lib/validations/booking";
+import {
+  Phone,
+  Mail01,
+  Calendar,
+  Clock,
+  CheckVerified02,
+  ArrowRight,
+  Gift01,
+  MessageChatSquare,
+  MarkerPin01,
+} from "@untitledui/icons";
 
-const bookingFormSchema = z.object({
-  customerName: z.string().min(1, "Name is required").max(100),
-  customerPhone: z.string().min(1, "Phone is required").max(30),
-  customerEmail: z.string().email("Invalid email").optional().or(z.literal("")),
-  vehicleMake: z.string().max(100).optional(),
-  vehicleModel: z.string().max(100).optional(),
-  registration: z.string().max(20).optional(),
-  colour: z.string().max(50).optional(),
-  vehicleSize: z.string().optional(),
-  address: z.string().min(1, "Address is required").max(300),
-  postcode: z.string().min(1, "Postcode is required").max(20),
+const bookingFormSchema = bookingSchema.extend({
   keyCollectionSame: z.literal("on").optional(),
-  keyCollectionAddress: z.string().max(300).optional(),
-  requestedService: z.string().min(1, "Please select a service"),
-  selectedExtras: z.array(z.string()).optional(),
-  requestedDate: z.string().min(1, "Please select a date"),
-  requestedTime: z.string().min(1, "Please select a time"),
-  notes: z.string().max(1000).optional(),
   discountCode: z.string().max(50).optional(),
 });
 
-type BookingFormData = z.infer<typeof bookingFormSchema>;
+type BookingFormInput = z.input<typeof bookingFormSchema>;
+type BookingFormData = z.output<typeof bookingFormSchema>;
 
 export default function BookPageContent() {
   const searchParams = useSearchParams();
@@ -44,10 +41,10 @@ export default function BookPageContent() {
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     setValue,
     formState: { errors },
-  } = useForm<BookingFormData>({
+  } = useForm<BookingFormInput, undefined, BookingFormData>({
     resolver: zodResolver(bookingFormSchema),
     defaultValues: {
       selectedExtras: [],
@@ -59,8 +56,8 @@ export default function BookPageContent() {
     },
   });
 
-  const keyCollectionSame = watch("keyCollectionSame") === "on";
-  const selectedExtras = watch("selectedExtras") || [];
+  const keyCollectionSame = useWatch({ control, name: "keyCollectionSame" }) === "on";
+  const selectedExtras = useWatch({ control, name: "selectedExtras", defaultValue: [] }) || [];
 
   useEffect(() => {
     const service = searchParams.get("service");
@@ -78,10 +75,11 @@ export default function BookPageContent() {
     if (current.includes(id)) {
       setValue(
         "selectedExtras",
-        current.filter((x) => x !== id)
+        current.filter((x) => x !== id),
+        { shouldValidate: true, shouldDirty: true }
       );
     } else {
-      setValue("selectedExtras", [...current, id]);
+      setValue("selectedExtras", [...current, id], { shouldValidate: true, shouldDirty: true });
     }
   };
 
@@ -93,25 +91,18 @@ export default function BookPageContent() {
         customerName: data.customerName,
         customerPhone: data.customerPhone,
         customerEmail: data.customerEmail || undefined,
-        vehicle: [data.vehicleMake, data.vehicleModel, data.colour, data.vehicleSize]
-          .filter(Boolean)
-          .join(" ") || "Not specified",
+        address: data.address,
         postcode: data.postcode,
+        vehicleMake: data.vehicleMake || undefined,
+        vehicleModel: data.vehicleModel || undefined,
+        registration: data.registration || undefined,
+        colour: data.colour || undefined,
+        keyCollectionAddress: keyCollectionSame ? undefined : data.keyCollectionAddress || undefined,
         requestedService: data.requestedService,
         selectedExtras: data.selectedExtras,
         requestedDate: data.requestedDate,
         requestedTime: data.requestedTime,
-        notes: [
-          data.notes,
-          data.registration ? `Registration: ${data.registration}` : "",
-          data.address ? `Address: ${data.address}` : "",
-          !data.keyCollectionSame && data.keyCollectionAddress
-            ? `Key collection: ${data.keyCollectionAddress}`
-            : "",
-          data.discountCode ? `Discount code: ${data.discountCode}` : "",
-        ]
-          .filter(Boolean)
-          .join("\n"),
+        notes: data.notes || undefined,
       };
 
       const res = await fetch("/api/booking-requests", {
@@ -138,26 +129,29 @@ export default function BookPageContent() {
   tomorrow.setDate(tomorrow.getDate() + 1);
   const minDate = tomorrow.toISOString().split("T")[0];
 
+  const inputBase =
+    "w-full rounded-lg border border-white/[0.06] bg-[#0a0a0f] px-3.5 py-2.5 text-[13px] text-white placeholder:text-[#3a3a45] outline-none transition focus:border-[#1d4ed8]/50 focus:ring-1 focus:ring-[#1d4ed8]/20";
+  const labelBase = "block text-[12px] font-semibold text-[#8a8a95]";
+  const errorBase = "mt-1 text-[11px] text-[#dc2626]";
+
   if (submitSuccess) {
     return (
-      <div className="min-h-screen bg-[#090909] text-white">
+      <div className="min-h-screen bg-[#09090d] text-white">
         <SiteHeader />
         <main className="mx-auto flex max-w-2xl flex-col items-center px-4 py-24 text-center md:px-6">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#62c275]/10 text-[#62c275]">
-            <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#22c55e]/10 text-[#22c55e]">
+            <CheckVerified02 size={32} />
           </div>
-          <h1 className="mt-6 text-3xl font-bold tracking-tight md:text-4xl">
+          <h1 className="mt-6 text-[32px] font-bold tracking-tight md:text-[40px]">
             Request Received
           </h1>
-          <p className="mt-4 text-[#a3a3a3]">
+          <p className="mt-4 text-[14px] leading-relaxed text-[#5a5a65]">
             Thank you. We have received your booking request and will review it shortly. You will hear back from us within 24 hours to confirm your appointment.
           </p>
           <div className="mt-8 flex flex-col gap-4 sm:flex-row">
             <Link
               href="/"
-              className="rounded-md bg-[#3b82f6] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#2563eb]"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-6 py-3 text-[13px] font-semibold text-white transition hover:bg-[#1e40af]"
             >
               Back to Home
             </Link>
@@ -165,14 +159,15 @@ export default function BookPageContent() {
               href={siteConfig.whatsapp}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-md border border-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:border-white/25"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-6 py-3 text-[13px] font-semibold text-white transition hover:border-white/20"
             >
+              <MessageChatSquare size={16} />
               Message on WhatsApp
             </a>
           </div>
-          <p className="mt-6 text-sm text-[#525252]">
+          <p className="mt-6 text-[12px] text-[#3a3a45]">
             Need to make changes? Call us at{" "}
-            <a href={siteConfig.phoneHref} className="text-[#a3a3a3] hover:text-white">
+            <a href={siteConfig.phoneHref} className="text-[#5a5a65] hover:text-white">
               {siteConfig.phone}
             </a>
           </p>
@@ -183,86 +178,83 @@ export default function BookPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#090909] text-white">
+    <div className="min-h-screen bg-[#09090d] text-white">
       <SiteHeader />
       <main className="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-14">
         <div className="mb-8">
-          <Link href="/" className="text-sm text-[#a3a3a3] transition hover:text-white">
-            &larr; Back to home
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1 text-[13px] text-[#5a5a65] transition hover:text-white"
+          >
+            <ArrowRight size={14} className="rotate-180" />
+            Back to home
           </Link>
         </div>
 
         <div className="text-center">
-          <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
-            Schedule Your <span className="text-[#3b82f6]">Appointment</span>
+          <h1 className="text-[32px] font-bold tracking-tight md:text-[48px]">
+            Schedule Your <span className="text-[#1d4ed8]">Appointment</span>
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-[#a3a3a3]">
+          <p className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed text-[#5a5a65]">
             Choose your preferred date, time, and service. We&apos;ll confirm your appointment within 24 hours.
           </p>
         </div>
 
-        <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_380px]">
+        <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_360px]">
           {/* Form */}
-          <div className="rounded-xl border border-white/5 bg-[#111] p-5 md:p-8">
-            <h2 className="text-lg font-semibold">Book Your Service</h2>
-            <p className="mt-1 text-sm text-[#a3a3a3]">
+          <div className="rounded-xl border border-white/[0.04] bg-[#0f0f14] p-5 md:p-8">
+            <h2 className="text-[16px] font-semibold">Book Your Service</h2>
+            <p className="mt-1 text-[13px] text-[#5a5a65]">
               Fill out the form to schedule your appointment
             </p>
 
             <a
               href={siteConfig.phoneHref}
-              className="mt-4 flex items-center justify-center gap-2 rounded-lg border border-[#62c275]/30 bg-[#62c275]/5 py-3 text-sm font-semibold text-[#62c275] transition hover:bg-[#62c275]/10"
+              className="mt-4 flex items-center justify-center gap-2 rounded-lg border border-[#22c55e]/20 bg-[#22c55e]/5 py-3 text-[13px] font-semibold text-[#22c55e] transition hover:bg-[#22c55e]/10"
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
+              <Phone size={16} />
               Don&apos;t feel like filling forms? Call us now!
             </a>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-6">
-              {/* Service, Extras, Date, Time */}
-              <div className="grid gap-4 sm:grid-cols-2">
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-5">
+              {/* Hidden postcode */}
+              <input type="hidden" {...register("postcode")} />
+
+              {/* Row 1: 4 selects */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
-                  <label htmlFor="requestedService" className="block text-sm font-semibold">
-                    Select Service <span className="text-[#d63d2e]">*</span>
+                  <label htmlFor="requestedService" className={labelBase}>
+                    Select Service <span className="text-[#dc2626]">*</span>
                   </label>
-                  <select
-                    id="requestedService"
-                    {...register("requestedService")}
-                    className="mt-2 w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white outline-none transition focus:border-[#3b82f6]"
-                  >
-                    <option value="">Choose a service</option>
+                  <select id="requestedService" {...register("requestedService")} className={`${inputBase} mt-1.5`}>
+                    <option value="" className="bg-[#0a0a0f]">Choose a service</option>
                     {serviceTiers.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.name} — From &pound;{t.startingPrice}
+                      <option key={t.id} value={t.id} className="bg-[#0a0a0f]">
+                        {t.name}
                       </option>
                     ))}
                   </select>
-                  {errors.requestedService && (
-                    <p className="mt-1 text-xs text-[#d63d2e]">{errors.requestedService.message}</p>
-                  )}
+                  {errors.requestedService && <p className={errorBase}>{errors.requestedService.message}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold">Select Extras (Optional)</label>
-                  <div className="relative mt-2">
-                    <select
-                      className="w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white outline-none transition focus:border-[#3b82f6]"
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          toggleExtra(e.target.value);
-                          e.target.value = "";
-                        }
-                      }}
-                    >
-                      <option value="">Choose extras</option>
-                      {serviceExtras.map((extra) => (
-                        <option key={extra.id} value={extra.id}>
-                          {extra.name} (+&pound;{extra.price})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <label className={labelBase}>Select Extras (Optional)</label>
+                  <select
+                    className={`${inputBase} mt-1.5`}
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        toggleExtra(e.target.value);
+                        e.target.value = "";
+                      }
+                    }}
+                  >
+                    <option value="" className="bg-[#0a0a0f]">Choose extras</option>
+                    {serviceExtras.map((extra) => (
+                      <option key={extra.id} value={extra.id} className="bg-[#0a0a0f]">
+                        {extra.name} (+&pound;{extra.price})
+                      </option>
+                    ))}
+                  </select>
                   {selectedExtras.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-2">
                       {selectedExtras.map((id) => {
@@ -270,13 +262,13 @@ export default function BookPageContent() {
                         return extra ? (
                           <span
                             key={id}
-                            className="inline-flex items-center gap-1 rounded-full bg-[#3b82f6]/10 px-2.5 py-1 text-xs text-[#3b82f6]"
+                            className="inline-flex items-center gap-1 rounded-full border border-[#1d4ed8]/20 bg-[#1d4ed8]/10 px-2.5 py-1 text-[11px] text-[#1d4ed8]"
                           >
                             {extra.name}
                             <button
                               type="button"
                               onClick={() => toggleExtra(id)}
-                              className="ml-1 hover:text-white"
+                              className="ml-0.5 hover:text-white"
                               aria-label={`Remove ${extra.name}`}
                             >
                               &times;
@@ -289,98 +281,100 @@ export default function BookPageContent() {
                 </div>
 
                 <div>
-                  <label htmlFor="requestedDate" className="block text-sm font-semibold">
-                    Select Date <span className="text-[#d63d2e]">*</span>
+                  <label htmlFor="requestedDate" className={labelBase}>
+                    Select Date <span className="text-[#dc2626]">*</span>
                   </label>
                   <input
                     id="requestedDate"
                     type="date"
                     min={minDate}
                     {...register("requestedDate")}
-                    className="mt-2 w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white outline-none transition focus:border-[#3b82f6]"
+                    className={`${inputBase} mt-1.5`}
                   />
-                  {errors.requestedDate && (
-                    <p className="mt-1 text-xs text-[#d63d2e]">{errors.requestedDate.message}</p>
-                  )}
+                  {errors.requestedDate && <p className={errorBase}>{errors.requestedDate.message}</p>}
                 </div>
 
                 <div>
-                  <label htmlFor="requestedTime" className="block text-sm font-semibold">
-                    Select Time <span className="text-[#d63d2e]">*</span>
+                  <label htmlFor="requestedTime" className={labelBase}>
+                    Select Time <span className="text-[#dc2626]">*</span>
                   </label>
-                  <select
-                    id="requestedTime"
-                    {...register("requestedTime")}
-                    className="mt-2 w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white outline-none transition focus:border-[#3b82f6]"
-                  >
-                    <option value="">Select time</option>
+                  <select id="requestedTime" {...register("requestedTime")} className={`${inputBase} mt-1.5`}>
+                    <option value="" className="bg-[#0a0a0f]">Select time</option>
                     {timeWindows.map((tw) => (
-                      <option key={tw} value={tw}>
+                      <option key={tw} value={tw} className="bg-[#0a0a0f]">
                         {tw}
                       </option>
                     ))}
                   </select>
-                  {errors.requestedTime && (
-                    <p className="mt-1 text-xs text-[#d63d2e]">{errors.requestedTime.message}</p>
-                  )}
+                  {errors.requestedTime && <p className={errorBase}>{errors.requestedTime.message}</p>}
                 </div>
               </div>
 
-              {/* Contact Info */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="customerName" className="block text-sm font-semibold">
-                    Person of contact <span className="text-[#d63d2e]">*</span>
-                  </label>
-                  <input
-                    id="customerName"
-                    type="text"
-                    placeholder="Name / Surname"
-                    {...register("customerName")}
-                    className="mt-2 w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white placeholder:text-[#525252] outline-none transition focus:border-[#3b82f6]"
-                  />
-                  {errors.customerName && (
-                    <p className="mt-1 text-xs text-[#d63d2e]">{errors.customerName.message}</p>
-                  )}
+              {/* Row 2-4: Contact fields (left 1/2) + Map (right 1/2, spans 3 rows) */}
+              <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="customerName" className={labelBase}>
+                      Person of contact <span className="text-[#dc2626]">*</span>
+                    </label>
+                    <input
+                      id="customerName"
+                      type="text"
+                      placeholder="Name/Surname"
+                      {...register("customerName")}
+                      className={`${inputBase} mt-1.5`}
+                    />
+                    {errors.customerName && <p className={errorBase}>{errors.customerName.message}</p>}
+                  </div>
+
+                  <div>
+                    <label htmlFor="customerPhone" className={labelBase}>
+                      Phone <span className="text-[#dc2626]">*</span>
+                    </label>
+                    <input
+                      id="customerPhone"
+                      type="tel"
+                      placeholder="Enter contact number"
+                      {...register("customerPhone")}
+                      className={`${inputBase} mt-1.5`}
+                    />
+                    {errors.customerPhone && <p className={errorBase}>{errors.customerPhone.message}</p>}
+                  </div>
+
+                  <div>
+                    <label htmlFor="customerEmail" className={labelBase}>
+                      E-mail (Optional)
+                    </label>
+                    <input
+                      id="customerEmail"
+                      type="email"
+                      placeholder="Enter contact e-mail"
+                      {...register("customerEmail")}
+                      className={`${inputBase} mt-1.5`}
+                    />
+                    {errors.customerEmail && <p className={errorBase}>{errors.customerEmail.message}</p>}
+                  </div>
                 </div>
 
-                <div>
-                  <label htmlFor="customerPhone" className="block text-sm font-semibold">
-                    Phone <span className="text-[#d63d2e]">*</span>
-                  </label>
-                  <input
-                    id="customerPhone"
-                    type="tel"
-                    placeholder="Enter contact number"
-                    {...register("customerPhone")}
-                    className="mt-2 w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white placeholder:text-[#525252] outline-none transition focus:border-[#3b82f6]"
-                  />
-                  {errors.customerPhone && (
-                    <p className="mt-1 text-xs text-[#d63d2e]">{errors.customerPhone.message}</p>
-                  )}
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label htmlFor="customerEmail" className="block text-sm font-semibold">
-                    E-mail (Optional)
-                  </label>
-                  <input
-                    id="customerEmail"
-                    type="email"
-                    placeholder="Enter contact e-mail"
-                    {...register("customerEmail")}
-                    className="mt-2 w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white placeholder:text-[#525252] outline-none transition focus:border-[#3b82f6]"
-                  />
-                  {errors.customerEmail && (
-                    <p className="mt-1 text-xs text-[#d63d2e]">{errors.customerEmail.message}</p>
-                  )}
+                <div className="hidden lg:flex lg:flex-col">
+                  <label className={`${labelBase} invisible`}>Service Area</label>
+                  <div className="mt-1.5 flex-1 min-h-0 overflow-hidden rounded-lg border border-white/[0.06]">
+                    <iframe
+                      title="London service area"
+                      src="https://www.openstreetmap.org/export/embed.html?bbox=-0.35%2C51.35%2C0.15%2C51.65&layer=mapnik"
+                      className="h-full w-full border-0"
+                      style={{
+                        filter: "invert(90%) hue-rotate(180deg) brightness(0.75) contrast(1.1)",
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Vehicle Info */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="vehicleMake" className="block text-sm font-semibold">
+              {/* Row 5: Car Make (1/4) | Model (1/4) | Car Location (1/2) */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+                <div className="sm:col-span-1">
+                  <label htmlFor="vehicleMake" className={labelBase}>
                     Car Make
                   </label>
                   <input
@@ -388,11 +382,11 @@ export default function BookPageContent() {
                     type="text"
                     placeholder="BMW, Mercedes, etc."
                     {...register("vehicleMake")}
-                    className="mt-2 w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white placeholder:text-[#525252] outline-none transition focus:border-[#3b82f6]"
+                    className={`${inputBase} mt-1.5`}
                   />
                 </div>
-                <div>
-                  <label htmlFor="vehicleModel" className="block text-sm font-semibold">
+                <div className="sm:col-span-1">
+                  <label htmlFor="vehicleModel" className={labelBase}>
                     Model
                   </label>
                   <input
@@ -400,23 +394,40 @@ export default function BookPageContent() {
                     type="text"
                     placeholder="M3, E-Class, etc."
                     {...register("vehicleModel")}
-                    className="mt-2 w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white placeholder:text-[#525252] outline-none transition focus:border-[#3b82f6]"
+                    className={`${inputBase} mt-1.5`}
                   />
                 </div>
-                <div>
-                  <label htmlFor="registration" className="block text-sm font-semibold">
+                <div className="sm:col-span-2">
+                  <label htmlFor="address" className={labelBase}>
+                    Car Location <span className="text-[#dc2626]">*</span>
+                  </label>
+                  <input
+                    id="address"
+                    type="text"
+                    placeholder="Enter address or post code"
+                    {...register("address")}
+                    className={`${inputBase} mt-1.5`}
+                  />
+                  {errors.address && <p className={errorBase}>{errors.address.message}</p>}
+                </div>
+              </div>
+
+              {/* Row 6: Registration (1/4) | Color (1/4) | Key Location (1/2 with toggle) */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+                <div className="sm:col-span-1">
+                  <label htmlFor="registration" className={labelBase}>
                     Registration
                   </label>
                   <input
                     id="registration"
                     type="text"
-                    placeholder="AB12 CDE"
+                    placeholder="AB123 CDE"
                     {...register("registration")}
-                    className="mt-2 w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white placeholder:text-[#525252] outline-none transition focus:border-[#3b82f6]"
+                    className={`${inputBase} mt-1.5`}
                   />
                 </div>
-                <div>
-                  <label htmlFor="colour" className="block text-sm font-semibold">
+                <div className="sm:col-span-1">
+                  <label htmlFor="colour" className={labelBase}>
                     Color
                   </label>
                   <input
@@ -424,90 +435,41 @@ export default function BookPageContent() {
                     type="text"
                     placeholder="Red, Blue, etc."
                     {...register("colour")}
-                    className="mt-2 w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white placeholder:text-[#525252] outline-none transition focus:border-[#3b82f6]"
+                    className={`${inputBase} mt-1.5`}
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label htmlFor="vehicleSize" className="block text-sm font-semibold">
-                    Vehicle Size
+                  <label htmlFor="keyCollectionAddress" className={labelBase}>
+                    Key Location
                   </label>
-                  <select
-                    id="vehicleSize"
-                    {...register("vehicleSize")}
-                    className="mt-2 w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white outline-none transition focus:border-[#3b82f6]"
-                  >
-                    <option value="">Select size</option>
-                    <option value="Small">Small (e.g., Fiat 500, Mini)</option>
-                    <option value="Medium">Medium (e.g., Golf, A3, 1-Series)</option>
-                    <option value="Large">Large (e.g., 5-Series, E-Class)</option>
-                    <option value="SUV">SUV / 4x4</option>
-                    <option value="7-seater">7-Seater / Van</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Location */}
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="sm:col-span-2">
-                  <label htmlFor="address" className="block text-sm font-semibold">
-                    Car Location <span className="text-[#d63d2e]">*</span>
-                  </label>
-                  <input
-                    id="address"
-                    type="text"
-                    placeholder="Enter address or post code"
-                    {...register("address")}
-                    className="mt-2 w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white placeholder:text-[#525252] outline-none transition focus:border-[#3b82f6]"
-                  />
-                  {errors.address && (
-                    <p className="mt-1 text-xs text-[#d63d2e]">{errors.address.message}</p>
-                  )}
-                </div>
-                <div className="sm:col-span-2">
-                  <label htmlFor="postcode" className="block text-sm font-semibold">
-                    Postcode <span className="text-[#d63d2e]">*</span>
-                  </label>
-                  <input
-                    id="postcode"
-                    type="text"
-                    placeholder="e.g. SW1A 1AA"
-                    {...register("postcode")}
-                    className="mt-2 w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white placeholder:text-[#525252] outline-none transition focus:border-[#3b82f6]"
-                  />
-                  {errors.postcode && (
-                    <p className="mt-1 text-xs text-[#d63d2e]">{errors.postcode.message}</p>
-                  )}
-                </div>
-                <div className="flex items-center gap-3 sm:col-span-2">
-                  <input
-                    id="keyCollectionSame"
-                    type="checkbox"
-                    {...register("keyCollectionSame")}
-                    className="h-4 w-4 rounded border-white/10 bg-[#0d0d0d] text-[#3b82f6] accent-[#3b82f6]"
-                  />
-                  <label htmlFor="keyCollectionSame" className="text-sm text-[#d4d4d4]">
-                    Key location same as car location
-                  </label>
-                </div>
-                {!keyCollectionSame && (
-                  <div className="sm:col-span-2">
-                    <label htmlFor="keyCollectionAddress" className="block text-sm font-semibold">
-                      Key Collection Address
-                    </label>
+                  {/* Make container relative so the switch can be absolutely positioned
+                      and vertically centered relative to the input field only. */}
+                  <div className="mt-1.5 relative">
                     <input
                       id="keyCollectionAddress"
                       type="text"
-                      placeholder="Enter key collection address"
+                      placeholder={keyCollectionSame ? "Same as car location" : "Enter key collection address"}
+                      disabled={keyCollectionSame}
                       {...register("keyCollectionAddress")}
-                      className="mt-2 w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white placeholder:text-[#525252] outline-none transition focus:border-[#3b82f6]"
+                      // reserve space for the absolutely positioned switch on the right
+                      className={`${inputBase} w-full pr-14 disabled:opacity-40`}
                     />
+
+                    <label className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex cursor-pointer items-center">
+                      <input
+                        id="keyCollectionSame"
+                        type="checkbox"
+                        {...register("keyCollectionSame")}
+                        className="peer sr-only"
+                      />
+                      <div className="peer h-6 w-11 rounded-full bg-[#1a1a20] relative after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#22c55e] peer-checked:after:translate-x-full" />
+                    </label>
                   </div>
-                )}
+                </div>
               </div>
 
-              {/* Notes & Discount */}
               <div>
-                <label htmlFor="notes" className="block text-sm font-semibold">
+                <label htmlFor="notes" className={labelBase}>
                   Additional Notes (Optional)
                 </label>
                 <textarea
@@ -515,12 +477,12 @@ export default function BookPageContent() {
                   rows={4}
                   placeholder="Any special requests or notes about the vehicle..."
                   {...register("notes")}
-                  className="mt-2 w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white placeholder:text-[#525252] outline-none transition focus:border-[#3b82f6]"
+                  className={`${inputBase} mt-1.5 resize-none`}
                 />
               </div>
 
               <div>
-                <label htmlFor="discountCode" className="block text-sm font-semibold">
+                <label htmlFor="discountCode" className={labelBase}>
                   Discount Code (Optional)
                 </label>
                 <input
@@ -528,12 +490,12 @@ export default function BookPageContent() {
                   type="text"
                   placeholder="Enter your discount code"
                   {...register("discountCode")}
-                  className="mt-2 w-full rounded-md border border-white/10 bg-[#0d0d0d] px-3 py-2.5 text-sm text-white placeholder:text-[#525252] outline-none transition focus:border-[#3b82f6]"
+                  className={`${inputBase} mt-1.5`}
                 />
               </div>
 
               {submitError && (
-                <div className="rounded-md border border-[#d63d2e]/30 bg-[#d63d2e]/10 p-4 text-sm text-[#f06a5d]">
+                <div className="rounded-lg border border-[#dc2626]/20 bg-[#dc2626]/10 p-4 text-[13px] text-[#f87171]">
                   {submitError}
                 </div>
               )}
@@ -541,7 +503,7 @@ export default function BookPageContent() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex w-full items-center justify-center gap-2 rounded-md bg-[#3b82f6] py-3.5 text-sm font-bold text-white transition hover:bg-[#2563eb] disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#1d4ed8] py-3.5 text-[13px] font-bold text-white transition hover:bg-[#1e40af] disabled:opacity-50 active:scale-[0.98]"
               >
                 {submitting ? (
                   <>
@@ -553,84 +515,74 @@ export default function BookPageContent() {
                   </>
                 ) : (
                   <>
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
+                    <Calendar size={16} />
                     Book Appointment
                   </>
                 )}
               </button>
 
-              <p className="text-center text-xs text-[#525252]">
+              <p className="text-center text-[11px] text-[#3a3a45]">
                 This is a booking request, not an instant confirmation. The owner will review and confirm your appointment.
               </p>
             </form>
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Contact Info */}
-            <div className="rounded-xl border border-white/5 bg-[#111] p-5">
-              <h3 className="text-sm font-semibold">Contact Information</h3>
-              <p className="mt-1 text-xs text-[#a3a3a3]">Multiple ways to reach us</p>
+          <div className="space-y-5">
+            <div className="rounded-xl border border-white/[0.04] bg-[#0f0f14] p-5">
+              <h3 className="text-[13px] font-semibold">Contact Information</h3>
+              <p className="mt-0.5 text-[12px] text-[#5a5a65]">Multiple ways to reach us</p>
               <div className="mt-4 space-y-4">
                 <div className="flex items-start gap-3">
-                  <svg className="mt-0.5 h-4 w-4 shrink-0 text-[#3b82f6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
+                  <Phone size={15} className="mt-0.5 shrink-0 text-[#1d4ed8]" />
                   <div>
-                    <p className="text-sm font-semibold">Phone &amp; SMS</p>
-                    <p className="text-xs text-[#a3a3a3]">Call or message on WhatsApp</p>
-                    <a href={siteConfig.phoneHref} className="text-sm text-white hover:underline">
+                    <p className="text-[12px] font-semibold">Phone &amp; SMS</p>
+                    <p className="text-[11px] text-[#5a5a65]">Call or message on WhatsApp</p>
+                    <a href={siteConfig.phoneHref} className="text-[13px] text-white hover:underline">
                       {siteConfig.phone}
                     </a>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <svg className="mt-0.5 h-4 w-4 shrink-0 text-[#3b82f6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
+                  <Mail01 size={15} className="mt-0.5 shrink-0 text-[#1d4ed8]" />
                   <div>
-                    <p className="text-sm font-semibold">Email</p>
-                    <p className="text-xs text-[#a3a3a3]">Email us your questions</p>
-                    <a href={`mailto:${siteConfig.email}`} className="text-sm text-white hover:underline">
+                    <p className="text-[12px] font-semibold">Email</p>
+                    <p className="text-[11px] text-[#5a5a65]">Email us your questions</p>
+                    <a href={`mailto:${siteConfig.email}`} className="text-[13px] text-white hover:underline">
                       {siteConfig.email}
                     </a>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <svg className="mt-0.5 h-4 w-4 shrink-0 text-[#3b82f6]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <Clock size={15} className="mt-0.5 shrink-0 text-[#1d4ed8]" />
                   <div>
-                    <p className="text-sm font-semibold">Business Hours</p>
-                    <p className="text-xs text-[#d4d4d4]">{siteConfig.hours.weekday}</p>
-                    <p className="text-xs text-[#d4d4d4]">{siteConfig.hours.saturday}</p>
-                    <p className="text-xs text-[#d63d2e]">{siteConfig.hours.sunday}</p>
+                    <p className="text-[12px] font-semibold">Business Hours</p>
+                    <p className="text-[11px] text-[#8a8a95]">{siteConfig.hours.weekday}</p>
+                    <p className="text-[11px] text-[#8a8a95]">{siteConfig.hours.saturday}</p>
+                    <p className="text-[11px] text-[#dc2626]">{siteConfig.hours.sunday}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Map placeholder */}
-            <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-white/5 bg-[#111]">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-white/[0.04]">
               <Image
                 src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80"
-                alt="London service area map"
+                alt="London service area"
                 fill
-                sizes="380px"
-                className="object-cover opacity-60"
+                sizes="360px"
+                className="object-cover opacity-50"
               />
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="rounded-full bg-[#111]/90 px-4 py-2 text-xs font-semibold text-white">
+                <span className="flex items-center gap-2 rounded-full bg-[#0f0f14]/90 px-4 py-2 text-[11px] font-semibold text-white">
+                  <MarkerPin01 size={12} />
                   Mobile service across London
                 </span>
               </div>
             </div>
 
-            {/* Why book with us */}
-            <div className="rounded-xl border border-white/5 bg-[#111] p-5">
-              <h3 className="text-sm font-semibold">Why Book With Us?</h3>
+            <div className="rounded-xl border border-white/[0.04] bg-[#0f0f14] p-5">
+              <h3 className="text-[13px] font-semibold">Why Book With Us?</h3>
               <ul className="mt-4 space-y-3">
                 {[
                   "Free consultation and estimate",
@@ -641,32 +593,25 @@ export default function BookPageContent() {
                   "Top-notch quality products used",
                   "Loyalty rewards program",
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-sm text-[#d4d4d4]">
-                    <svg className="h-4 w-4 shrink-0 text-[#62c275]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
+                  <li key={item} className="flex items-center gap-2 text-[12px] text-[#8a8a95]">
+                    <CheckVerified02 size={14} className="shrink-0 text-[#22c55e]" />
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* Offer */}
-            <div className="rounded-xl border border-[#d63d2e]/20 bg-gradient-to-br from-[#d63d2e]/10 to-[#111] p-5 text-center">
-              <span className="inline-block rounded-full bg-[#d63d2e] px-3 py-1 text-xs font-bold text-white">
+            <div className="rounded-xl border border-[#c5a059]/15 bg-gradient-to-br from-[#c5a059]/8 to-[#0f0f14] p-5 text-center">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#c5a059] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#09090d]">
+                <Gift01 size={12} />
                 Limited Time Offer
               </span>
-              <p className="mt-3 text-sm font-semibold">
+              <p className="mt-3 text-[13px] font-semibold">
                 Get 20% off your first service when you book online
               </p>
-              <p className="mt-2 text-xs text-[#a3a3a3]">
-                Use code: <span className="font-bold text-white">FIRST20</span>
+              <p className="mt-2 text-[12px] text-[#5a5a65]">
+                Use code: <span className="font-bold text-[#c5a059]">FIRST20</span>
               </p>
-              <div className="mt-3 flex justify-center">
-                <svg className="h-6 w-6 text-[#d63d2e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                </svg>
-              </div>
             </div>
           </div>
         </div>
