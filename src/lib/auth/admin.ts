@@ -8,7 +8,17 @@ import { supabaseAdmin } from '../supabase/server'
 // Fallback (temporary): x-owner-token header matched to OWNER_API_TOKEN if present.
 export async function isAdminAuthorized(req: Request) {
   const ADMIN_EMAIL = process.env.ADMIN_EMAIL
+  const ADMIN_EMAILS = process.env.ADMIN_EMAILS
   const OWNER_API_TOKEN = process.env.OWNER_API_TOKEN
+
+  const allowedAdminEmails = new Set(
+    [
+      ...(ADMIN_EMAILS ? ADMIN_EMAILS.split(',') : []),
+      ...(ADMIN_EMAIL ? [ADMIN_EMAIL] : []),
+    ]
+      .map((email) => email.trim().toLowerCase())
+      .filter(Boolean),
+  )
 
   // 1. Prefer Bearer token (Supabase session JWT)
   const auth = req.headers.get('authorization')
@@ -23,12 +33,12 @@ export async function isAdminAuthorized(req: Request) {
       }
       const user = data?.user
       if (!user) return false
-      if (!ADMIN_EMAIL) {
-        // If ADMIN_EMAIL not configured, do not authorize via Supabase user
-        console.warn('admin auth: ADMIN_EMAIL not configured; rejecting bearer token')
+      if (allowedAdminEmails.size === 0) {
+        // If no admin emails are configured, do not authorize via Supabase user.
+        console.warn('admin auth: no admin emails configured; rejecting bearer token')
         return false
       }
-      return user.email === ADMIN_EMAIL
+      return !!user.email && allowedAdminEmails.has(user.email.toLowerCase())
     } catch (err) {
       console.error('admin auth: unexpected error', err)
       return false
