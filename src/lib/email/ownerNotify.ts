@@ -33,6 +33,9 @@ export async function sendOwnerNotification(id: string, payload: OwnerNotifyPayl
   const OWNER_NOTIFICATION_EMAIL = process.env.OWNER_NOTIFICATION_EMAIL
   const ADMIN_EMAIL = process.env.ADMIN_EMAIL
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL
+  // New per-sender envs
+  const RESEND_ALERTS_FROM_EMAIL = process.env.RESEND_ALERTS_FROM_EMAIL
+  const RESEND_REPLY_FROM_EMAIL = process.env.RESEND_REPLY_FROM_EMAIL
 
   if (!RESEND_API_KEY || !OWNER_NOTIFICATION_EMAIL) {
     // Silent no-op: owner notifications are optional in some environments.
@@ -83,19 +86,27 @@ export async function sendOwnerNotification(id: string, payload: OwnerNotifyPayl
 
   try {
     const resend = new Resend(RESEND_API_KEY)
-    const from = process.env.RESEND_FROM_EMAIL ?? ADMIN_EMAIL
+    const from = RESEND_ALERTS_FROM_EMAIL ?? process.env.RESEND_FROM_EMAIL ?? ADMIN_EMAIL
     if (!from) {
-      console.warn('Owner notification: RESEND_FROM_EMAIL or ADMIN_EMAIL must be configured')
+      console.warn('Owner notification: RESEND_ALERTS_FROM_EMAIL or RESEND_FROM_EMAIL or ADMIN_EMAIL must be configured')
       return
     }
 
-    await resend.emails.send({
+    const sendOpts: Parameters<Resend['emails']['send']>[0] = {
       from,
       to: OWNER_NOTIFICATION_EMAIL,
       subject,
       html,
       text,
-    })
+    }
+
+    // If a reply-to is configured, set it for owner alerts so replies go to a human
+    if (RESEND_REPLY_FROM_EMAIL) {
+      // @ts-expect-error - Resend typings allow reply_to but TS may not know
+      sendOpts.reply_to = RESEND_REPLY_FROM_EMAIL
+    }
+
+    await resend.emails.send(sendOpts)
   } catch (err: unknown) {
     // Keep logs generic and do not print secrets or the full payload
     let message = String(err)

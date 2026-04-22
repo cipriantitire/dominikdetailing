@@ -30,9 +30,13 @@ export type CustomerConfirmPayload = {
 // Send a confirmation email to the customer. Fails safely when config is missing.
 export async function sendCustomerConfirmationEmail(payload: CustomerConfirmPayload) {
   const RESEND_API_KEY = process.env.RESEND_API_KEY
+  const RESEND_BOOKINGS_FROM_EMAIL = process.env.RESEND_BOOKINGS_FROM_EMAIL
+  const RESEND_REPLY_FROM_EMAIL = process.env.RESEND_REPLY_FROM_EMAIL
   const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL
 
-  if (!RESEND_API_KEY || !RESEND_FROM_EMAIL) {
+  const fromEmail = RESEND_BOOKINGS_FROM_EMAIL ?? RESEND_FROM_EMAIL
+
+  if (!RESEND_API_KEY || !fromEmail) {
     console.info('Customer confirmation skipped: RESEND config not present')
     return
   }
@@ -78,13 +82,21 @@ export async function sendCustomerConfirmationEmail(payload: CustomerConfirmPayl
       console.info('Customer confirmation: no customer email provided, skipping send')
       return
     }
-    await resend.emails.send({
-      from: RESEND_FROM_EMAIL,
+
+    const sendOpts: Parameters<Resend['emails']['send']>[0] = {
+      from: fromEmail,
       to: payload.customerEmail,
       subject,
       html,
       text,
-    })
+    }
+
+    if (RESEND_REPLY_FROM_EMAIL) {
+      // @ts-expect-error - Resend typings allow reply_to but TS may not know
+      sendOpts.reply_to = RESEND_REPLY_FROM_EMAIL
+    }
+
+    await resend.emails.send(sendOpts)
   } catch (err) {
     console.error('Customer confirmation email failed', { bookingId: payload.id, message: String(err) })
   }
