@@ -2,6 +2,17 @@ import 'server-only'
 import { Resend } from 'resend'
 import { serviceTiers, serviceExtras } from '../../config/services'
 
+function escapeHtml(input: unknown) {
+  if (input === undefined || input === null) return ''
+  const s = String(input)
+  return s
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+}
+
 export type OwnerNotifyPayload = {
   customerName: string
   customerPhone: string
@@ -35,22 +46,22 @@ export async function sendOwnerNotification(id: string, payload: OwnerNotifyPayl
 
   const subject = `New booking request — ${payload.customerName}`
 
-  const adminLink = SITE_URL ? `${SITE_URL.replace(/\/$/, '')}/admin/bookings?id=${id}` : undefined
+  const adminLink = SITE_URL ? `${SITE_URL.replace(/\/$/, '')}/admin/bookings?id=${encodeURIComponent(id)}` : undefined
 
   const html = `
     <div style="font-family:system-ui,Arial;line-height:1.4;color:#111">
-      <p>New booking request received (ID: <strong>${id}</strong>).</p>
+      <p>New booking request received (ID: <strong>${escapeHtml(id)}</strong>).</p>
       <ul>
-        <li><strong>Name:</strong> ${payload.customerName}</li>
-        <li><strong>Phone:</strong> ${payload.customerPhone}</li>
-        <li><strong>Email:</strong> ${payload.customerEmail ?? '—'}</li>
-        <li><strong>Service:</strong> ${serviceName}</li>
-        <li><strong>Requested:</strong> ${payload.requestedDate ?? '—'} ${payload.requestedTime ?? ''}</li>
-        <li><strong>Address / Postcode:</strong> ${payload.address}${payload.postcode ? ' / ' + payload.postcode : ''}</li>
-        <li><strong>Extras:</strong> ${extrasNames.length ? extrasNames.join(', ') : 'None'}</li>
+        <li><strong>Name:</strong> ${escapeHtml(payload.customerName)}</li>
+        <li><strong>Phone:</strong> ${escapeHtml(payload.customerPhone)}</li>
+        <li><strong>Email:</strong> ${escapeHtml(payload.customerEmail ?? '—')}</li>
+        <li><strong>Service:</strong> ${escapeHtml(serviceName)}</li>
+        <li><strong>Requested:</strong> ${escapeHtml(payload.requestedDate ?? '—')} ${escapeHtml(payload.requestedTime ?? '')}</li>
+        <li><strong>Address / Postcode:</strong> ${escapeHtml(payload.address)}${payload.postcode ? ' / ' + escapeHtml(payload.postcode) : ''}</li>
+        <li><strong>Extras:</strong> ${escapeHtml(extrasNames.length ? extrasNames.join(', ') : 'None')}</li>
       </ul>
-      ${payload.notes ? `<p><strong>Notes:</strong> ${payload.notes}</p>` : ''}
-      ${adminLink ? `<p><a href="${adminLink}">Open in admin</a></p>` : ''}
+      ${payload.notes ? `<p><strong>Notes:</strong> ${escapeHtml(payload.notes)}</p>` : ''}
+      ${adminLink ? `<p><a href="${escapeHtml(adminLink)}">Open in admin</a></p>` : ''}
       <p style="color:#666;font-size:12px">This is an automated notification from Dominik Detailing.</p>
     </div>
   `
@@ -72,7 +83,11 @@ export async function sendOwnerNotification(id: string, payload: OwnerNotifyPayl
 
   try {
     const resend = new Resend(RESEND_API_KEY)
-    const from = ADMIN_EMAIL ?? `no-reply@${new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'example.com').hostname}`
+    const from = process.env.RESEND_FROM_EMAIL ?? ADMIN_EMAIL
+    if (!from) {
+      console.warn('Owner notification: RESEND_FROM_EMAIL or ADMIN_EMAIL must be configured')
+      return
+    }
 
     await resend.emails.send({
       from,

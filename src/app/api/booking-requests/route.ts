@@ -5,38 +5,7 @@ import { supabaseAdmin } from '../../../lib/supabase/server'
 import { ZodError } from 'zod'
 import { sendOwnerNotification } from '../../../lib/email/ownerNotify'
 
-// Simple in-memory rate limiter keyed by IP. This is best-effort for single-instance
-// deployments and protects the public endpoint from casual spamming. For production
-// use a shared store (Redis, Vercel KV, Upstash) for consistent limits across instances.
-const RATE_LIMIT_WINDOW_MS = 60 * 1000 // 1 minute
-const RATE_LIMIT_MAX_REQUESTS = 10
-const ipHits: Map<string, { ts: number[] }> = new Map()
-
-function pruneRateLimitStore(now: number) {
-  for (const [key, entry] of ipHits.entries()) {
-    entry.ts = entry.ts.filter((t) => now - t <= RATE_LIMIT_WINDOW_MS)
-    if (entry.ts.length === 0) {
-      ipHits.delete(key)
-    } else {
-      ipHits.set(key, entry)
-    }
-  }
-}
-
-function isRateLimited(ip: string) {
-  const now = Date.now()
-  pruneRateLimitStore(now)
-  const entry = ipHits.get(ip) ?? { ts: [] }
-  // keep only timestamps inside the window
-  entry.ts = entry.ts.filter((t) => now - t <= RATE_LIMIT_WINDOW_MS)
-  if (entry.ts.length >= RATE_LIMIT_MAX_REQUESTS) {
-    ipHits.set(ip, entry)
-    return true
-  }
-  entry.ts.push(now)
-  ipHits.set(ip, entry)
-  return false
-}
+import { isLimited } from '../../../lib/rateLimiter'
 
 export async function POST(req: Request) {
   try {
@@ -52,7 +21,9 @@ export async function POST(req: Request) {
     // Rate limit by inferred IP (best-effort). In serverless, use x-forwarded-for if present.
     const forwarded = req.headers.get('x-forwarded-for')
     const ip = forwarded ? forwarded.split(',')[0].trim() : req.headers.get('x-real-ip') ?? 'unknown'
-    if (isRateLimited(ip)) {
+    const max = Number(process.env.RATE_LIMIT_MAX_PER_WINDOW ?? undefined) || undefined
+    const windowSec = Number(process.env.RATE_LIMIT_WINDOW_SEC ?? undefined) || undefined
+    if (isLimited(ip, max, windowSec)) {
       return NextResponse.json({ ok: false, error: 'Too many requests' }, { status: 429 })
     }
 

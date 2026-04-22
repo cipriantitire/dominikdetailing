@@ -3,22 +3,15 @@ import { NextResponse } from 'next/server'
 import { listBookingRequests, getBookingRequestById } from '../../../../lib/supabase/adminReads'
 import { updateBookingRequest } from '../../../../lib/supabase/adminMutations'
 import { z } from 'zod'
+import { isAdminAuthorized } from '../../../../lib/auth/admin'
 
-// Minimal protection for the admin read endpoints. This requires the caller to send
-// an x-owner-token header that matches the OWNER_API_TOKEN server environment variable.
-// Do NOT store secrets in client-side code. This is a minimal stop-gap; replace with
-// proper admin auth in the future.
-const OWNER_API_TOKEN = process.env.OWNER_API_TOKEN
-
-function isAuthorized(req: Request) {
-  if (!OWNER_API_TOKEN) return false
-  const token = req.headers.get('x-owner-token')
-  return token === OWNER_API_TOKEN
-}
+// Admin endpoints: prefer Authorization: Bearer <supabase_session_jwt> with ADMIN_EMAIL
+// configured. A legacy x-owner-token fallback (OWNER_API_TOKEN) is supported only
+// during migration. See src/lib/auth/admin.ts for details.
 
 export async function GET(req: Request) {
   try {
-    if (!isAuthorized(req)) {
+    if (!(await isAdminAuthorized(req))) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -26,11 +19,21 @@ export async function GET(req: Request) {
     const id = url.searchParams.get('id')
     if (id) {
       const booking = await getBookingRequestById(id)
+      if (!booking) {
+        return NextResponse.json({ ok: false, error: 'Booking not found' }, { status: 404 })
+      }
       return NextResponse.json({ ok: true, booking })
     }
     const limit = parseInt(url.searchParams.get('limit') || '50', 10)
     const offset = parseInt(url.searchParams.get('offset') || '0', 10)
-    const list = await listBookingRequests(limit, offset)
+    const q = url.searchParams.get('q')
+    const statusParam = url.searchParams.get('status')
+    const allowedStatus = new Set(['all', 'pending', 'reviewing', 'proposed', 'confirmed', 'declined', 'cancelled'])
+    const status = statusParam && allowedStatus.has(statusParam) ? statusParam : 'all'
+    const activeOnly = url.searchParams.get('activeOnly') === 'true'
+    const sort = url.searchParams.get('sort')
+
+    const list = await listBookingRequests({ limit, offset, q, status, activeOnly, sort })
     return NextResponse.json({ ok: true, data: list })
   } catch (err) {
     console.error('Admin read error', err)
@@ -41,7 +44,7 @@ export async function GET(req: Request) {
 // Admin mutation endpoint: update small set of pre-confirm fields.
 export async function PATCH(req: Request) {
   try {
-    if (!isAuthorized(req)) {
+    if (!(await isAdminAuthorized(req))) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -66,6 +69,12 @@ export async function PATCH(req: Request) {
     }
 
     const { id, ...updates } = parsed.data
+
+    // Reject empty update payloads
+    const keys = Object.keys(updates).filter((k) => updates[k as keyof typeof updates] !== undefined)
+    if (keys.length === 0) {
+      return NextResponse.json({ ok: false, error: 'No update fields provided' }, { status: 400 })
+    }
 
     const updated = await updateBookingRequest(id, updates)
     return NextResponse.json({ ok: true, booking: updated })

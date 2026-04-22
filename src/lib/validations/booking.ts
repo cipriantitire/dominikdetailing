@@ -1,5 +1,6 @@
 import { z, ZodError } from 'zod'
 import { serviceTiers, serviceExtras, timeWindows } from '../../config/services'
+import { isValidUkPostcode, normalizeUkPostcode } from '../location/ukPostcode'
 
 // Build runtime allowed value lists from config
 // Widen the literal types to plain string[] so Zod predicates accept string inputs
@@ -42,7 +43,17 @@ export const bookingSchema = z.object({
 
   // Structured address fields (keep postcode separate)
   address: z.string().trim().min(1, 'Address is required').max(300),
-  postcode: z.string().trim().min(1, 'Postcode is required').max(20),
+  postcode: z.preprocess(
+    (value) => {
+      if (typeof value !== 'string') return value
+      return normalizeUkPostcode(value.trim())
+    },
+    z
+      .string()
+      .min(1, 'Postcode is required')
+      .max(10)
+      .refine((value) => isValidUkPostcode(value), { message: 'Enter a valid UK postcode' }),
+  ),
 
   // Structured vehicle fields
   vehicleMake: optionalTrimmedString(100),

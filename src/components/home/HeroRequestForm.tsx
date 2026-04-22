@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import BorderBeam from "border-beam";
 import { serviceTiers, timeWindows } from "@/config/services";
+import { isValidUkPostcode, normalizeUkPostcode } from "@/lib/location/ukPostcode";
 
 export default function HeroRequestForm() {
   const router = useRouter();
@@ -11,11 +12,20 @@ export default function HeroRequestForm() {
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [service, setService] = useState("");
+  const [locationError, setLocationError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const normalizedPostcode = normalizeUkPostcode(postcode);
+    if (normalizedPostcode && !isValidUkPostcode(normalizedPostcode)) {
+      setLocationError("Enter a valid UK postcode, for example SW1A 1AA.");
+      return;
+    }
+
+    setLocationError("");
     const params = new URLSearchParams();
-    if (postcode) params.set("postcode", postcode);
+    if (normalizedPostcode) params.set("postcode", normalizedPostcode);
     if (date) params.set("date", date);
     if (time) params.set("time", time);
     if (service) params.set("service", service);
@@ -34,20 +44,25 @@ export default function HeroRequestForm() {
       className="mx-auto flex w-full max-w-4xl flex-col gap-2"
     >
       <div className="overflow-hidden rounded-xl border border-white/[0.06] bg-[#0f0f14]/80 backdrop-blur-md">
-        <div className="grid gap-px bg-white/[0.04] sm:grid-cols-2 lg:grid-cols-4">
-          <div className="bg-[#0f0f14] p-4 transition hover:bg-[#13131a]">
+        <div className="grid grid-cols-2 gap-px bg-white/[0.04] lg:grid-cols-4">
+          <div className="col-span-2 bg-[#0f0f14] p-4 transition hover:bg-[#13131a] lg:col-span-1">
             <label htmlFor="hero-location" className="block text-left text-[11px] font-semibold uppercase tracking-wider text-[#686878]">
               Location
             </label>
-            <input
-              id="hero-location"
-              type="text"
-              value={postcode}
-              onChange={(e) => setPostcode(e.target.value)}
-              placeholder="Postcode"
-              className={`mt-1.5 w-full bg-transparent text-[14px] text-white placeholder:text-[#484855] outline-none ${inputFocus}`}
-            />
-          </div>
+              <input
+                id="hero-location"
+                type="text"
+                value={postcode}
+                onChange={(e) => {
+                  setPostcode(e.target.value);
+                  if (locationError) setLocationError("");
+                }}
+                onBlur={() => setPostcode((current) => normalizeUkPostcode(current))}
+                autoComplete="postal-code"
+                placeholder="Enter UK postcode"
+                className={`mt-1.5 w-full bg-transparent text-[14px] text-white placeholder:text-[#484855] outline-none ${inputFocus}`}
+              />
+            </div>
           <div className="bg-[#0f0f14] p-4 transition hover:bg-[#13131a]">
             <label htmlFor="hero-date" className="block text-left text-[11px] font-semibold uppercase tracking-wider text-[#686878]">
               Date
@@ -79,7 +94,7 @@ export default function HeroRequestForm() {
               ))}
             </select>
           </div>
-          <div className="bg-[#0f0f14] p-4 transition hover:bg-[#13131a]">
+          <div className="col-span-2 bg-[#0f0f14] p-4 transition hover:bg-[#13131a] lg:col-span-1">
             <label htmlFor="hero-service" className="block text-left text-[11px] font-semibold uppercase tracking-wider text-[#686878]">
               Service
             </label>
@@ -99,6 +114,7 @@ export default function HeroRequestForm() {
           </div>
         </div>
       </div>
+      {locationError && <p className="px-1 text-left text-[11px] text-[#f87171]">{locationError}</p>}
       <BorderBeam
         size="line"
         colorVariant="ocean"

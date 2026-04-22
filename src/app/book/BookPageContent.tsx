@@ -12,6 +12,7 @@ import { siteConfig } from "@/config/site";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
 import { bookingSchema } from "@/lib/validations/booking";
+import { isValidUkPostcode, normalizeUkPostcode } from "@/lib/location/ukPostcode";
 import {
   Phone,
   Mail01,
@@ -32,17 +33,65 @@ const bookingFormSchema = bookingSchema.extend({
 type BookingFormInput = z.input<typeof bookingFormSchema>;
 type BookingFormData = z.output<typeof bookingFormSchema>;
 
+type PostcodeContext = {
+  postcode: string;
+  country?: string;
+  region?: string;
+  district?: string;
+  ward?: string;
+  parish?: string;
+  latitude?: number;
+  longitude?: number;
+};
+
+type PostcodeLookupResponse = {
+  ok?: boolean;
+  postcode?: string;
+  message?: string;
+  error?: string;
+  postcodeContext?: PostcodeContext | null;
+  location?: {
+    latitude?: number;
+    longitude?: number;
+  } | null;
+};
+
+const DEFAULT_MAP_EMBED_SRC =
+  "https://www.openstreetmap.org/export/embed.html?bbox=-0.35%2C51.35%2C0.15%2C51.65&layer=mapnik";
+
+const buildMapEmbedSrc = (latitude: number, longitude: number) => {
+  const delta = 0.02;
+  const minLon = longitude - delta;
+  const minLat = latitude - delta;
+  const maxLon = longitude + delta;
+  const maxLat = latitude + delta;
+
+  const params = new URLSearchParams({
+    bbox: `${minLon},${minLat},${maxLon},${maxLat}`,
+    layer: "mapnik",
+    marker: `${latitude},${longitude}`,
+  });
+
+  return `https://www.openstreetmap.org/export/embed.html?${params.toString()}`;
+};
+
 export default function BookPageContent() {
   const searchParams = useSearchParams();
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [addressLookupLoading, setAddressLookupLoading] = useState(false);
+  const [addressLookupError, setAddressLookupError] = useState("");
+  const [postcodeLookupMessage, setPostcodeLookupMessage] = useState("");
+  const [postcodeContext, setPostcodeContext] = useState<PostcodeContext | null>(null);
+  const [mapEmbedSrc, setMapEmbedSrc] = useState(DEFAULT_MAP_EMBED_SRC);
 
   const {
     register,
     handleSubmit,
     control,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm<BookingFormInput, undefined, BookingFormData>({
     resolver: zodResolver(bookingFormSchema),
@@ -65,10 +114,91 @@ export default function BookPageContent() {
     const date = searchParams.get("date");
     const time = searchParams.get("time");
     if (service) setValue("requestedService", service);
-    if (postcode) setValue("postcode", postcode);
+    if (postcode) setValue("postcode", normalizeUkPostcode(postcode));
     if (date) setValue("requestedDate", date);
     if (time) setValue("requestedTime", time);
   }, [searchParams, setValue]);
+
+  const postcodeRegistration = register("postcode");
+
+  const findAddressOptions = async () => {
+    const postcodeValue = getValues("postcode");
+    const postcode = normalizeUkPostcode(typeof postcodeValue === "string" ? postcodeValue : "");
+    setValue("postcode", postcode, { shouldValidate: true, shouldDirty: true });
+
+    if (!postcode) {
+      setPostcodeLookupMessage("");
+      setPostcodeContext(null);
+      setMapEmbedSrc(DEFAULT_MAP_EMBED_SRC);
+      setAddressLookupError("Enter a postcode to find addresses.");
+      return;
+    }
+
+    if (!isValidUkPostcode(postcode)) {
+      setPostcodeLookupMessage("");
+      setPostcodeContext(null);
+      setMapEmbedSrc(DEFAULT_MAP_EMBED_SRC);
+      setAddressLookupError("Enter a valid UK postcode (for example SW1A 1AA).");
+      return;
+    }
+
+    setAddressLookupLoading(true);
+    setAddressLookupError("");
+    setPostcodeLookupMessage("");
+    setPostcodeContext(null);
+    setMapEmbedSrc(DEFAULT_MAP_EMBED_SRC);
+
+    try {
+      const response = await fetch(`/api/address-lookup?postcode=${encodeURIComponent(postcode)}`);
+      const payload = (await response.json()) as PostcodeLookupResponse;
+
+      if (!response.ok || !payload?.ok) {
+        setAddressLookupError(
+          payload?.error || "Could not find addresses for this postcode. Please enter your address manually."
+        );
+        return;
+      }
+
+      if (typeof payload.postcode === "string" && payload.postcode.length > 0) {
+        setValue("postcode", payload.postcode, { shouldValidate: true, shouldDirty: true });
+      }
+
+      const context =
+        payload.postcodeContext && typeof payload.postcodeContext === "object"
+          ? payload.postcodeContext
+          : null;
+
+      setPostcodeContext(context);
+
+      const latitude =
+        typeof payload.location?.latitude === "number"
+          ? payload.location.latitude
+          : typeof context?.latitude === "number"
+            ? context.latitude
+            : null;
+
+      const longitude =
+        typeof payload.location?.longitude === "number"
+          ? payload.location.longitude
+          : typeof context?.longitude === "number"
+            ? context.longitude
+            : null;
+
+      if (typeof latitude === "number" && typeof longitude === "number") {
+        setMapEmbedSrc(buildMapEmbedSrc(latitude, longitude));
+      }
+
+      setPostcodeLookupMessage(
+        typeof payload.message === "string" && payload.message.length > 0
+          ? payload.message
+          : "Postcode confirmed. Enter your street and house number manually."
+      );
+    } catch {
+      setAddressLookupError("Address lookup is unavailable right now. Please type your address manually.");
+    } finally {
+      setAddressLookupLoading(false);
+    }
+  };
 
   const toggleExtra = (id: string) => {
     const current = selectedExtras;
@@ -92,7 +222,7 @@ export default function BookPageContent() {
         customerPhone: data.customerPhone,
         customerEmail: data.customerEmail || undefined,
         address: data.address,
-        postcode: data.postcode,
+        postcode: normalizeUkPostcode(data.postcode),
         vehicleMake: data.vehicleMake || undefined,
         vehicleModel: data.vehicleModel || undefined,
         registration: data.registration || undefined,
@@ -217,8 +347,6 @@ export default function BookPageContent() {
             </a>
 
             <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-5">
-              {/* Hidden postcode */}
-              <input type="hidden" {...register("postcode")} />
 
               {/* Row 1: 4 selects */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -360,8 +488,8 @@ export default function BookPageContent() {
                   <label className={`${labelBase} invisible`}>Service Area</label>
                   <div className="mt-1.5 flex-1 min-h-0 overflow-hidden rounded-lg border border-white/[0.06]">
                     <iframe
-                      title="London service area"
-                      src="https://www.openstreetmap.org/export/embed.html?bbox=-0.35%2C51.35%2C0.15%2C51.65&layer=mapnik"
+                      title={postcodeContext?.postcode ? `Map for ${postcodeContext.postcode}` : "London service area"}
+                      src={mapEmbedSrc}
                       className="h-full w-full border-0"
                       style={{
                         filter: "invert(90%) hue-rotate(180deg) brightness(0.75) contrast(1.1)",
@@ -398,17 +526,71 @@ export default function BookPageContent() {
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label htmlFor="address" className={labelBase}>
+                  <label htmlFor="postcode" className={labelBase}>
                     Car Location <span className="text-[#dc2626]">*</span>
                   </label>
-                  <input
-                    id="address"
-                    type="text"
-                    placeholder="Enter address or post code"
-                    {...register("address")}
-                    className={`${inputBase} mt-1.5`}
-                  />
-                  {errors.address && <p className={errorBase}>{errors.address.message}</p>}
+                  <div className="mt-1.5 space-y-2">
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+                      <input
+                        id="postcode"
+                        type="text"
+                        inputMode="text"
+                        autoComplete="postal-code"
+                        placeholder="UK postcode (e.g. SW1A 1AA)"
+                        {...postcodeRegistration}
+                        onChange={(event) => {
+                          postcodeRegistration.onChange(event);
+                          setAddressLookupError("");
+                          setPostcodeLookupMessage("");
+                          setPostcodeContext(null);
+                          setMapEmbedSrc(DEFAULT_MAP_EMBED_SRC);
+                        }}
+                        onBlur={(event) => {
+                          postcodeRegistration.onBlur(event);
+                          const normalized = normalizeUkPostcode(event.target.value);
+                          setValue("postcode", normalized, { shouldValidate: true, shouldDirty: true });
+                        }}
+                        className={inputBase}
+                      />
+                      <button
+                        type="button"
+                        onClick={findAddressOptions}
+                        disabled={addressLookupLoading}
+                        className="inline-flex items-center justify-center rounded-lg border border-white/[0.08] px-3.5 py-2.5 text-[12px] font-semibold text-white transition hover:border-white/20 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {addressLookupLoading ? "Checking..." : "Check postcode"}
+                      </button>
+                    </div>
+
+                    {errors.postcode && <p className={errorBase}>{errors.postcode.message}</p>}
+                    {addressLookupError && <p className={errorBase}>{addressLookupError}</p>}
+                    {postcodeLookupMessage && <p className="text-[11px] text-[#22c55e]">{postcodeLookupMessage}</p>}
+                    {postcodeContext && (
+                      <p className="text-[11px] text-[#686878]">
+                        {[
+                          postcodeContext.district,
+                          postcodeContext.ward,
+                          postcodeContext.region,
+                          postcodeContext.country,
+                        ]
+                          .filter(Boolean)
+                          .join(" • ")}
+                      </p>
+                    )}
+
+                    <input
+                      id="address"
+                      type="text"
+                      autoComplete="street-address"
+                      placeholder="Street and house number"
+                      {...register("address")}
+                      className={inputBase}
+                    />
+                    {errors.address && <p className={errorBase}>{errors.address.message}</p>}
+                    <p className="text-[11px] text-[#686878]">
+                      Check your postcode first, then enter house number and street address manually.
+                    </p>
+                  </div>
                 </div>
               </div>
 

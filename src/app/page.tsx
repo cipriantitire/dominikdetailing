@@ -69,25 +69,36 @@ export default function Home() {
       {/* Hero — asymmetric, left-aligned */}
       <section className="relative min-h-[92dvh] overflow-hidden">
         <div className="absolute inset-0">
+          {/* Desktop hero image */}
           <Image
-            src="https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&w=2000&q=80"
+            src="/hero-desktop.png"
             alt="Premium car detailing"
             fill
             priority
+            quality={90}
             sizes="100vw"
-            className="object-cover"
+            className="hidden object-cover md:block"
           />
-          <div className="absolute inset-0 bg-[#09090d]/70" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#09090d] via-[#09090d]/30 to-[#09090d]/60" />
+          {/* Mobile hero image */}
+          <Image
+            src="/hero-mobile-v2.png"
+            alt="Premium car detailing"
+            fill
+            priority
+            quality={90}
+            sizes="100vw"
+            className="object-cover md:hidden"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#09090d] via-[#09090d]/50 to-[#09090d]/0" />
         </div>
 
-        <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-16 pt-16 text-center md:px-6 md:pb-24 md:pt-36">
+        <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-16 pt-12 text-center md:px-6 md:pb-24 md:pt-[120px]">
           <span className="inline-flex items-center gap-2 rounded-full border border-[#c5a059]/30 bg-[#c5a059]/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
             <Star06 size={14} />
             Limited Time: 20% OFF First Service
           </span>
 
-          <h1 className="mx-auto mt-7 max-w-3xl text-[40px] font-bold leading-[1.05] tracking-tight md:text-[64px] lg:text-[72px]">
+          <h1 className="mx-auto mt-5 max-w-3xl text-[40px] font-bold leading-[1.05] tracking-tight md:text-[64px] lg:text-[72px]">
             Premium car care.
             <br />
             <span className="text-[#9696a3]">Mobile.</span>
@@ -96,21 +107,21 @@ export default function Home() {
             Transform your vehicle with professional detailing, ceramic coating, and paint correction. We come to your home or workplace across London.
           </p>
 
-          <div className="mt-12 w-full max-w-4xl">
+          <div className="mt-10 w-full max-w-4xl">
             <HeroRequestForm />
           </div>
 
-          <div className="mx-auto mt-10 flex flex-wrap items-center justify-center gap-6 text-[12px] font-medium uppercase tracking-wider text-[#686878]">
+          <div className="mx-auto mt-10 flex flex-wrap items-center justify-center gap-6 text-[12px] font-medium uppercase tracking-wider text-[#9696a3]">
             <span className="flex items-center gap-2">
-              <ShieldTick size={15} className="text-[#1d4ed8]" />
+              <ShieldTick size={15} className="text-[#c5a059]" />
               Satisfaction Guaranteed
             </span>
             <span className="flex items-center gap-2">
-              <Award03 size={15} className="text-[#1d4ed8]" />
+              <Award03 size={15} className="text-[#c5a059]" />
               Certified Professional
             </span>
             <span className="flex items-center gap-2">
-              <CheckVerified02 size={15} className="text-[#1d4ed8]" />
+              <CheckVerified02 size={15} className="text-[#c5a059]" />
               5 Years Experience
             </span>
           </div>
@@ -325,7 +336,7 @@ export default function Home() {
                 alt="London mobile car detailing service area"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover"
+            className="object-cover object-[center_35%] md:object-center"
               />
             </div>
             <div>

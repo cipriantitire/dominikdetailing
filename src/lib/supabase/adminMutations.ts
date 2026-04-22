@@ -26,3 +26,34 @@ export async function updateBookingRequest(id: string, updates: AdminUpdatePaylo
   if (error) throw error
   return data
 }
+
+export type ConfirmPayload = {
+  confirmed_start_at: string
+  confirmed_end_at?: string | null
+  customer_notification_sent?: boolean
+}
+
+// Confirm a booking request. Requires the confirmed_start_at and confirmed_end_at
+// to be provided (ISO datetime strings). This sets status='confirmed' and stores
+// the confirmed start/end fields so customer communication can be derived from the
+// record.
+export async function confirmBookingRequest(id: string, payload: ConfirmPayload) {
+  const safeUpdates: Record<string, unknown> = {
+    status: 'confirmed',
+    confirmed_start_at: payload.confirmed_start_at,
+    confirmed_end_at: payload.confirmed_end_at ?? null,
+  }
+  if (typeof payload.customer_notification_sent === 'boolean') {
+    safeUpdates.customer_notification_sent = payload.customer_notification_sent
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('booking_requests')
+    .update(safeUpdates)
+    .eq('id', id)
+    .select('*')
+    .single()
+
+  if (error) throw error
+  return data
+}
