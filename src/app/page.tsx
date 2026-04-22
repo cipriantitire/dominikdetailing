@@ -67,7 +67,7 @@ export default function Home() {
       <SiteHeader />
 
       {/* Hero — asymmetric, left-aligned */}
-      <section className="relative min-h-[92dvh] overflow-hidden">
+      <section className="relative min-h-[92svh] overflow-hidden md:min-h-[92vh]">
         <div className="absolute inset-0">
           {/* Desktop hero image */}
           <Image

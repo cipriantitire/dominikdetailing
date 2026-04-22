@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { listBookings, reopenBooking, getWhatsAppMessage } from "@/lib/admin/api";
 import { BookingRequest, statusLabels, statusColors } from "@/types/admin";
 import { ArrowRight, Phone, MarkerPin01, Calendar, MessageChatSquare, Mail01 } from "@untitledui/icons";
-// router not required on this list page
 
 function formatShortDate(iso: string | null) {
   if (!iso) return null;
@@ -18,10 +17,10 @@ function formatShortDate(iso: string | null) {
 }
 
 export default function AdminBookingsPage() {
+  const router = useRouter();
   const [bookings, setBookings] = useState<BookingRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  // router not required on this list page
 
   const [q, setQ] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -73,7 +72,7 @@ export default function AdminBookingsPage() {
       } else {
         setBookings((prev) => prev.map((b) => (b.id === id ? res.data : b)))
       }
-    } catch (e) {
+    } catch {
       setError("Could not reopen booking")
     }
     setReopeningIds((s) => ({ ...s, [id]: false }))
@@ -96,7 +95,7 @@ export default function AdminBookingsPage() {
       const digits = sanitizePhoneForWa(phone);
       const url = `https://wa.me/${digits}?text=${encodeURIComponent(msg)}`;
       window.open(url, "_blank", "noopener,noreferrer");
-    } catch (e) {
+    } catch {
       setError("Could not open WhatsApp");
     }
     setWaLoadingIds((s) => ({ ...s, [id]: false }));
@@ -120,7 +119,7 @@ export default function AdminBookingsPage() {
 
   return (
     <div>
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4">
         <div>
           <h1 className="text-[24px] font-bold tracking-tight text-balance md:text-[28px]">
             Booking Requests
@@ -129,32 +128,57 @@ export default function AdminBookingsPage() {
             <span className="tabular-nums">{bookings.length}</span> total request{bookings.length !== 1 ? "s" : ""}
           </p>
         </div>
-        <div className="mt-3 flex gap-2 flex-wrap items-center">
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, phone, email, postcode, reg" className="rounded-md bg-[#0b0b0f] px-3 py-2 text-sm text-white border border-white/[0.04]" />
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-md bg-[#0b0b0f] px-3 py-2 text-sm text-white border border-white/[0.04]">
-            <option value="all">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="reviewing">Reviewing</option>
-            <option value="proposed">Proposed</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="declined">Declined</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-          <label className="inline-flex items-center gap-2 text-sm text-[#686878]"><input type="checkbox" checked={activeOnly} onChange={(e) => setActiveOnly(e.target.checked)} /> Active only</label>
-          <select value={sort} onChange={(e) => setSort(e.target.value)} className="rounded-md bg-[#0b0b0f] px-3 py-2 text-sm text-white border border-white/[0.04]">
-            <option value="newest">Newest created</option>
-            <option value="oldest">Oldest created</option>
-            <option value="requested_date">Requested date</option>
-            <option value="confirmed_date">Confirmed date</option>
-          </select>
-          <button
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className="inline-flex items-center gap-2 rounded-md bg-white/[0.03] px-3 py-2 text-sm text-white hover:bg-white/[0.05] disabled:opacity-50"
-            title="Refresh list"
-          >
-            {refreshing ? "Refreshing..." : "Refresh"}
-          </button>
+
+        <div className="flex flex-col gap-2">
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search name, phone, email, postcode, reg"
+            className="w-full rounded-md bg-[#0b0b0f] px-3 py-2 text-sm text-white border border-white/[0.04] outline-none transition-colors focus:border-[#1d4ed8]/50"
+          />
+          <div className="flex gap-2 flex-wrap items-center">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="rounded-md bg-[#0b0b0f] px-3 py-2 text-sm text-white border border-white/[0.04] outline-none"
+            >
+              <option value="all">All statuses</option>
+              <option value="pending">Pending</option>
+              <option value="reviewing">Reviewing</option>
+              <option value="proposed">Proposed</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="declined">Declined</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="completed">Completed</option>
+            </select>
+            <label className="inline-flex items-center gap-2 rounded-md border border-white/[0.04] bg-[#0b0b0f] px-3 py-2 text-sm text-[#686878]">
+              <input
+                type="checkbox"
+                checked={activeOnly}
+                onChange={(e) => setActiveOnly(e.target.checked)}
+                className="h-4 w-4 accent-[#1d4ed8]"
+              />
+              Active only
+            </label>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="rounded-md bg-[#0b0b0f] px-3 py-2 text-sm text-white border border-white/[0.04] outline-none"
+            >
+              <option value="newest">Newest created</option>
+              <option value="oldest">Oldest created</option>
+              <option value="requested_date">Requested date</option>
+              <option value="confirmed_date">Confirmed date</option>
+            </select>
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="inline-flex min-h-[40px] items-center gap-2 rounded-md bg-white/[0.03] px-3 py-2 text-sm text-white transition-colors hover:bg-white/[0.05] disabled:opacity-50 active:scale-[0.96]"
+              title="Refresh list"
+            >
+              {refreshing ? "Refreshing..." : "Refresh"}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -169,8 +193,10 @@ export default function AdminBookingsPage() {
           {bookings.map((booking) => (
             <div
               key={booking.id}
-              className="group flex flex-col gap-3 rounded-xl border border-white/[0.04] bg-[#0f0f14] p-4 shadow-[0_1px_2px_rgba(0,0,0,0.3)] transition-[colors,transform,border-color] hover:border-white/[0.08] active:scale-[0.98] md:flex-row md:items-center md:justify-between md:gap-4"
+              onClick={() => router.push(`/admin/bookings/${booking.id}`)}
+              className="group flex cursor-pointer flex-row items-start justify-between gap-3 rounded-xl border border-white/[0.04] bg-[#0f0f14] p-4 shadow-[0_1px_2px_rgba(0,0,0,0.3)] transition-[colors,transform,border-color] hover:border-white/[0.08] active:scale-[0.98] md:items-center md:gap-4"
             >
+              {/* Left column: details */}
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2.5">
                   <span
@@ -201,8 +227,8 @@ export default function AdminBookingsPage() {
                   </p>
                 </div>
 
-                <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-[#686878]">
-                  <span className="flex items-center gap-1 tabular-nums">
+                <div className="mt-1.5 flex flex-col gap-1 text-[12px] text-[#686878] md:flex-row md:items-center md:gap-x-4 md:gap-y-1">
+                  <span className="flex items-center gap-1.5 tabular-nums">
                     <Calendar size={12} />
                     {booking.status === "confirmed" && booking.confirmed_start_at
                       ? formatShortDate(booking.confirmed_start_at)
@@ -210,24 +236,50 @@ export default function AdminBookingsPage() {
                         ? formatShortDate(booking.proposed_start_at)
                         : booking.requested_date}
                   </span>
-                  <span className="flex items-center gap-1">
+                  <span className="flex items-center gap-1.5">
                     <MarkerPin01 size={12} />
                     {booking.postcode || booking.address}
                   </span>
-                  <span className="flex items-center gap-1 tabular-nums">
+                  <span className="flex items-center gap-1.5 tabular-nums">
                     <Phone size={12} />
                     {booking.customer_phone}
                   </span>
                 </div>
               </div>
 
-              <div className="flex shrink-0 items-center gap-3">
+              {/* Right column: buttons */}
+              <div
+                className="flex shrink-0 self-stretch flex-col items-end justify-between py-1"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Actions group */}
+                <div className="flex items-center gap-2">
+                  <div
+                    className="flex h-9 w-9 items-center justify-center rounded-md text-[#484855]"
+                    title="Open booking"
+                  >
+                    <ArrowRight
+                      size={16}
+                      className="transition-colors group-hover:text-white"
+                    />
+                  </div>
+                  {(booking.status === "declined" || booking.status === "cancelled") && (
+                    <button
+                      onClick={() => handleReopen(booking.id)}
+                      disabled={!!reopeningIds[booking.id]}
+                      className="inline-flex min-h-[40px] items-center rounded-lg border border-white/[0.04] bg-white/[0.02] px-3 py-2 text-[12px] font-medium text-[#9696a3] transition-colors hover:bg-white/[0.03] disabled:opacity-50 active:scale-[0.96]"
+                      title="Reopen"
+                    >
+                      {reopeningIds[booking.id] ? "Reopening..." : "Reopen"}
+                    </button>
+                  )}
+                </div>
+
                 {/* Contact group */}
                 <div className="flex items-center gap-0.5 rounded-lg border border-white/[0.04] bg-white/[0.02] p-0.5">
                   {booking.customer_phone && (
                     <a
                       href={`tel:${booking.customer_phone}`}
-                      onClick={(e) => e.stopPropagation()}
                       className="flex h-9 w-9 items-center justify-center rounded-md text-[#9696a3] transition-colors hover:text-white active:scale-[0.96]"
                       title="Call"
                     >
@@ -236,10 +288,7 @@ export default function AdminBookingsPage() {
                   )}
                   {booking.customer_phone && (
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenWhatsAppRow(booking.id, booking.customer_phone);
-                      }}
+                      onClick={() => handleOpenWhatsAppRow(booking.id, booking.customer_phone)}
                       disabled={!!waLoadingIds[booking.id]}
                       className="flex h-9 w-9 items-center justify-center rounded-md text-[#22c55e] transition-colors hover:text-white disabled:opacity-50 active:scale-[0.96]"
                       title="Open WhatsApp"
@@ -250,39 +299,12 @@ export default function AdminBookingsPage() {
                   {booking.customer_email && (
                     <a
                       href={`mailto:${booking.customer_email}`}
-                      onClick={(e) => e.stopPropagation()}
                       className="flex h-9 w-9 items-center justify-center rounded-md text-[#1d4ed8] transition-colors hover:text-white active:scale-[0.96]"
                       title="Email"
                     >
                       <Mail01 size={14} />
                     </a>
                   )}
-                </div>
-
-                {/* Actions group */}
-                <div className="flex items-center gap-2">
-                  {(booking.status === "declined" || booking.status === "cancelled") && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleReopen(booking.id);
-                      }}
-                      disabled={!!reopeningIds[booking.id]}
-                      className="inline-flex min-h-[40px] items-center rounded-lg border border-white/[0.04] bg-white/[0.02] px-3 py-2 text-[12px] font-medium text-[#9696a3] transition-colors hover:bg-white/[0.03] disabled:opacity-50 active:scale-[0.96]"
-                      title="Reopen"
-                    >
-                      {reopeningIds[booking.id] ? "Reopening..." : "Reopen"}
-                    </button>
-                  )}
-
-                  <Link
-                    href={`/admin/bookings/${booking.id}`}
-                    className="flex h-9 w-9 items-center justify-center rounded-md text-[#484855] transition-colors hover:text-white active:scale-[0.96]"
-                    onClick={(e) => e.stopPropagation()}
-                    title="Open booking"
-                  >
-                    <ArrowRight size={16} />
-                  </Link>
                 </div>
               </div>
             </div>
