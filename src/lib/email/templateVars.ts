@@ -1,132 +1,176 @@
 import 'server-only'
 import { getServiceImageUrl, getServiceTierById, serviceExtras } from '../../config/services'
 
-function ensureString(v: unknown) {
-  if (v === undefined || v === null) return ''
-  if (typeof v === 'string') return v
-  if (typeof v === 'number' || typeof v === 'boolean') return String(v)
+type BookingRecord = Record<string, unknown>
+
+function ensureString(value: unknown) {
+  if (value === undefined || value === null) return ''
+  if (typeof value === 'string') return value.trim()
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
   return ''
 }
 
 function getCanonicalSiteUrl(siteUrl?: string | null) {
   const value = ensureString(siteUrl ?? process.env.NEXT_PUBLIC_SITE_URL)
-  if (!value) return ''
-  if (!/^https?:\/\//i.test(value)) return ''
+  if (!value || !/^https?:\/\//i.test(value)) return ''
   return value.replace(/\/$/, '')
 }
 
-function fallbackLine(value: string, fallback: string) {
+function withFallback(value: string, fallback: string) {
   return value.trim() ? value : fallback
 }
 
-function joinExtras(selected: unknown) {
-  if (!selected) return null
-  if (Array.isArray(selected)) {
-    const ids = selected as unknown[]
-    const names = ids.map((id) => {
-      const sid = ensureString(id)
-      return serviceExtras.find((e) => e.id === sid)?.name ?? sid
+function joinParts(parts: string[], fallback: string) {
+  const value = parts.filter(Boolean).join(' ').replace(/\s+/g, ' ').trim()
+  return value || fallback
+}
+
+function getServiceId(booking: BookingRecord) {
+  return ensureString(booking.requested_service ?? booking.serviceId ?? booking.service_id)
+}
+
+function getServiceName(serviceId: string) {
+  return getServiceTierById(serviceId)?.name ?? withFallback(serviceId, 'Requested service')
+}
+
+function getAddressLine(booking: BookingRecord) {
+  return withFallback(ensureString(booking.address ?? booking.addressLine ?? booking.key_collection_address), 'Address pending')
+}
+
+function getPostcode(booking: BookingRecord) {
+  return ensureString(booking.postcode ?? booking.post_code ?? booking.postCode)
+}
+
+function getExtrasList(booking: BookingRecord) {
+  const selected = booking.selected_extras ?? booking.selectedExtras ?? booking.extras
+  if (!Array.isArray(selected)) return 'None'
+
+  const names = selected
+    .map((id) => {
+      const value = ensureString(id)
+      return serviceExtras.find((extra) => extra.id === value)?.name ?? value
     })
-    return names.length ? names.join(', ') : null
-  }
-  return null
+    .filter(Boolean)
+
+  return names.length ? names.join(', ') : 'None'
 }
 
-export function buildCommonTemplateVars(booking: Record<string, unknown>, siteUrl?: string | null) {
-  const site = getCanonicalSiteUrl(siteUrl)
-  const serviceId = ensureString(booking.requested_service ?? booking.serviceId ?? booking.service_id)
-
-  const service = getServiceTierById(serviceId)
-  const serviceName = service?.name ?? serviceId
-  const serviceImageUrl = site ? getServiceImageUrl(serviceId, site) : ''
-
-  const extras_line = joinExtras(booking.selected_extras ?? booking.selectedExtras ?? null) ?? 'None'
-
-  const address = ensureString(booking.address ?? booking.key_collection_address)
-  const postcode = ensureString(booking.postcode)
-  const location_line = fallbackLine(postcode ? `${address}, ${postcode}` : address, 'Location pending')
-
-  const id = ensureString(booking.id)
-  const admin_url = site ? `${site.replace(/\/$/, '')}/admin/bookings?id=${encodeURIComponent(id)}` : ''
-  const cta_url = site ? `${site.replace(/\/$/, '')}/book` : ''
-
-  return {
-    service_image_url: serviceImageUrl,
-    service_name: fallbackLine(serviceName, 'Requested service'),
-    customer_name: fallbackLine(ensureString(booking.customer_name ?? booking.customerName), 'Customer'),
-    customer_phone: fallbackLine(ensureString(booking.customer_phone ?? booking.customerPhone), 'Not provided'),
-    customer_email: fallbackLine(ensureString(booking.customer_email ?? booking.customerEmail), 'Not provided'),
-    location_line,
-    extras_line,
-    booking_id: fallbackLine(id, 'Pending reference'),
-    notes_line: fallbackLine(ensureString(booking.notes ?? booking.internal_notes), 'No notes provided'),
-    admin_url,
-    cta_url,
-  }
+function getRequestedDate(booking: BookingRecord) {
+  return withFallback(ensureString(booking.requested_date ?? booking.requestedDate), 'Date pending')
 }
 
-export function buildRequestedTemplateVars(booking: Record<string, unknown>, siteUrl?: string | null) {
-  const base = buildCommonTemplateVars(booking, siteUrl)
-  const date = ensureString(booking.requested_date ?? booking.requestedDate)
-  const time = ensureString(booking.requested_time ?? booking.requestedTime)
-  const requested_datetime_line = fallbackLine(date && time ? `${date} ${time}` : date || time || '', 'Requested time pending')
-  return {
-    ...base,
-    requested_datetime_line,
-  }
+function getRequestedTime(booking: BookingRecord) {
+  return withFallback(ensureString(booking.requested_time ?? booking.requestedTime), 'Time pending')
 }
 
-export function buildReviewTemplateVars(booking: Record<string, unknown>, siteUrl?: string | null) {
-  const base = buildCommonTemplateVars(booking, siteUrl)
-  const date = ensureString(booking.requested_date ?? booking.requestedDate)
-  const time = ensureString(booking.requested_time ?? booking.requestedTime)
-  const requested_datetime_line = fallbackLine(date && time ? `${date} ${time}` : date || time || '', 'Requested time pending')
-  return {
-    ...base,
-    requested_datetime_line,
-  }
-}
-
-export function buildConfirmedTemplateVars(booking: Record<string, unknown>, siteUrl?: string | null) {
-  const base = buildCommonTemplateVars(booking, siteUrl)
-
+function getConfirmedDatetime(booking: BookingRecord) {
   const start = ensureString(booking.confirmed_start_at ?? booking.confirmedStartAt)
+  if (!start) return 'Confirmed time pending'
+
   const end = ensureString(booking.confirmed_end_at ?? booking.confirmedEndAt)
 
-  let confirmed_datetime_line = ''
   try {
-    if (start) {
-      const s = new Date(start)
-      const e = end ? new Date(end) : null
-      const startStr = s.toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })
-      const endStr = e ? e.toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' }) : null
-      confirmed_datetime_line = endStr ? `${startStr} — ${endStr}` : startStr
-    }
+    const startDate = new Date(start)
+    const startText = startDate.toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })
+    if (!end) return startText
+
+    const endDate = new Date(end)
+    const endText = endDate.toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })
+    return `${startText} - ${endText}`
   } catch {
-    confirmed_datetime_line = start
-  }
-
-  const calendar_url = buildCalendarUrl(booking) ?? ''
-
-  return {
-    ...base,
-    confirmed_datetime_line: fallbackLine(confirmed_datetime_line, 'Confirmed time pending'),
-    calendar_url,
+    return start
   }
 }
 
-function buildCalendarUrl(booking: Record<string, unknown>) {
+function getCalendarUrl(booking: BookingRecord) {
   const start = ensureString(booking.confirmed_start_at ?? booking.confirmedStartAt)
   if (!start) return ''
-  const serviceId = ensureString(booking.requested_service ?? booking.serviceId ?? booking.service_id)
-  const title = encodeURIComponent(`Dominik Detailing — ${getServiceTierById(serviceId)?.name ?? serviceId}`)
+
+  const serviceId = getServiceId(booking)
+  const serviceName = getServiceName(serviceId)
+  const addressLine = getAddressLine(booking)
+  const postcode = getPostcode(booking)
+  const phone = ensureString(booking.customer_phone ?? booking.customerPhone)
+
   const startIso = new Date(start).toISOString().replace(/-|:|\./g, '')
-  const endVal = ensureString(booking.confirmed_end_at ?? booking.confirmedEndAt)
-  const endIso = endVal ? new Date(endVal).toISOString().replace(/-|:|\./g, '') : startIso
+  const endValue = ensureString(booking.confirmed_end_at ?? booking.confirmedEndAt)
+  const endIso = endValue ? new Date(endValue).toISOString().replace(/-|:|\./g, '') : startIso
   const dates = `${startIso}/${endIso}`
-  const address = ensureString(booking.address)
-  const postcode = ensureString(booking.postcode)
-  const details = encodeURIComponent(`Address: ${address}${postcode ? ' / ' + postcode : ''}`)
-  const location = encodeURIComponent(address + (postcode ? ' ' + postcode : ''))
-  return `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${location}&sf=true&output=xml`
+
+  const details = encodeURIComponent(
+    `Address: ${addressLine}${postcode ? ` / ${postcode}` : ''}${phone ? `\nPhone: ${phone}` : ''}`,
+  )
+  const location = encodeURIComponent(joinParts([addressLine, postcode], addressLine))
+
+  const title = encodeURIComponent(`Dominik Detailing — ${serviceName}`)
+  const baseUrl = 'https://www.google.com/calendar/render'
+  return `${baseUrl}?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${location}&sf=true&output=xml`
+}
+
+export function buildCommonTemplateVars(booking: BookingRecord, siteUrl?: string | null) {
+  const site = getCanonicalSiteUrl(siteUrl)
+  const serviceId = getServiceId(booking)
+  const serviceName = getServiceName(serviceId)
+  const serviceImage = site ? getServiceImageUrl(serviceId, site) : ''
+  const bookingId = ensureString(booking.id)
+  const customerName = withFallback(ensureString(booking.customer_name ?? booking.customerName), 'Customer')
+  const customerPhone = withFallback(ensureString(booking.customer_phone ?? booking.customerPhone), 'Not provided')
+  const customerEmail = withFallback(ensureString(booking.customer_email ?? booking.customerEmail), 'Not provided')
+  const addressLine = getAddressLine(booking)
+  const postcode = getPostcode(booking)
+  const requestedDate = getRequestedDate(booking)
+  const requestedTime = getRequestedTime(booking)
+  const requestedDatetimeLine = joinParts([requestedDate, requestedTime], 'Requested time pending')
+  const locationLine = joinParts([addressLine, postcode], 'Location pending')
+  const extrasList = getExtrasList(booking)
+  const notes = withFallback(ensureString(booking.notes), 'No notes provided')
+
+  return {
+    service_name: serviceName,
+    service_image: serviceImage,
+    service_image_url: serviceImage,
+    customer_name: customerName,
+    customer_phone: customerPhone,
+    customer_email: customerEmail,
+    address_line: addressLine,
+    postcode,
+    requested_date: requestedDate,
+    requested_time: requestedTime,
+    requested_datetime_line: requestedDatetimeLine,
+    location_line: locationLine,
+    extras_list: extrasList,
+    extras_line: extrasList,
+    notes,
+    notes_line: notes,
+    booking_id: withFallback(bookingId, 'Pending reference'),
+    admin_url: site && bookingId ? `${site}/admin/bookings/${encodeURIComponent(bookingId)}` : '',
+    cta_url: site ? `${site}/book${serviceId ? `?service=${encodeURIComponent(serviceId)}` : ''}` : '',
+    confirmed_datetime: '',
+    confirmed_datetime_line: '',
+    calendar_url: '',
+  }
+}
+
+export function buildRequestedTemplateVars(booking: BookingRecord, siteUrl?: string | null) {
+  return buildCommonTemplateVars(booking, siteUrl)
+}
+
+export function buildReviewTemplateVars(booking: BookingRecord, siteUrl?: string | null) {
+  return buildCommonTemplateVars(booking, siteUrl)
+}
+
+export function buildDeclinedTemplateVars(booking: BookingRecord, siteUrl?: string | null) {
+  return buildCommonTemplateVars(booking, siteUrl)
+}
+
+export function buildConfirmedTemplateVars(booking: BookingRecord, siteUrl?: string | null) {
+  const base = buildCommonTemplateVars(booking, siteUrl)
+  const confirmedDatetime = getConfirmedDatetime(booking)
+
+  return {
+    ...base,
+    confirmed_datetime: confirmedDatetime,
+    confirmed_datetime_line: confirmedDatetime,
+    calendar_url: getCalendarUrl(booking),
+  }
 }

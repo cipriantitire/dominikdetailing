@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { serviceTiers, serviceExtras } from "@/config/services";
+import { galleryItems } from "@/config/gallery";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
 import HeroRequestForm from "@/components/home/HeroRequestForm";
@@ -222,65 +223,92 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Before/After — split layout */}
+      {/* Gallery teaser — real job photos */}
       <section className="px-4 py-24 md:px-6">
         <div className="mx-auto max-w-7xl">
-          <div className="grid items-center gap-12 lg:grid-cols-2">
-            <div>
-              <span className="text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
-                Results
-              </span>
-              <h2 className="mt-3 text-[32px] font-bold tracking-tight md:text-[44px]">
-                See the Difference
-              </h2>
-              <p className="mt-4 max-w-md text-[14px] leading-relaxed text-[#686878]">
-                Real results from real jobs. Every vehicle receives the same meticulous attention, whether it is a daily driver or a weekend pride and joy.
-              </p>
-              <Link
-                href="/gallery"
-                className="mt-6 inline-flex items-center gap-2 text-[13px] font-semibold text-[#1d4ed8] transition hover:text-[#3b6cb7] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
+          <div className="mb-10 md:mb-14">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
+              Results
+            </span>
+            <h2 className="mt-3 text-[32px] font-bold tracking-tight md:text-[44px]">
+              See the Difference
+            </h2>
+            <p className="mt-4 max-w-md text-[14px] leading-relaxed text-[#686878]">
+              Real results from real jobs. Every vehicle receives the same meticulous attention, whether it is a daily driver or a weekend pride and joy.
+            </p>
+          </div>
+
+          {/* Mobile: 5 images */}
+          <div className="grid grid-cols-2 gap-3 md:hidden">
+            {[
+              galleryItems[0],
+              galleryItems[1],
+              galleryItems[4],
+              galleryItems[8],
+              galleryItems[10],
+            ].map((item, i) => (
+              <div
+                key={item.src}
+                className={`group relative overflow-hidden rounded-xl border border-white/[0.04] bg-[#0f0f14] ${
+                  i === 0 ? "col-span-2 aspect-[16/9]" : "aspect-[4/3]"
+                }`}
               >
-                View full gallery
-                <ArrowRight size={16} />
-              </Link>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {[
-                {
-                  src: "https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&w=600&q=80",
-                  label: "Interior Deep Clean",
-                },
-                {
-                  src: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=600&q=80",
-                  label: "Paint Enhancement",
-                },
-                {
-                  src: "https://images.unsplash.com/photo-1610555356070-d0efb6505f81?auto=format&fit=crop&w=600&q=80",
-                  label: "Ceramic Protection",
-                },
-                {
-                  src: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=600&q=80",
-                  label: "Machine Polish",
-                },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-white/[0.04]"
-                >
-                  <Image
-                    src={item.src}
-                    alt={item.label}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 25vw"
-                    className="object-cover transition duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-0 left-0 p-4">
-                    <p className="text-[13px] font-semibold">{item.label}</p>
-                  </div>
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  fill
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  className="object-cover"
+                  priority={i < 2}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                <div className="absolute bottom-0 left-0 p-3">
+                  {item.category && (
+                    <span className="mb-1 inline-block rounded bg-[#c5a059]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#c5a059]">
+                      {item.category}
+                    </span>
+                  )}
+                  <p className="text-[12px] font-medium leading-snug text-white/90">{item.alt}</p>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: 4 images */}
+          <div className="hidden md:grid grid-cols-2 gap-4 lg:grid-cols-4">
+            {[galleryItems[0], galleryItems[1], galleryItems[4], galleryItems[8]].map((item) => (
+              <div
+                key={item.src}
+                className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-white/[0.04] bg-[#0f0f14]"
+              >
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  fill
+                  sizes="(max-width: 1024px) 50vw, 25vw"
+                  className="object-cover transition duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                <div className="absolute bottom-0 left-0 p-4">
+                  {item.category && (
+                    <span className="mb-1 inline-block rounded bg-[#c5a059]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#c5a059]">
+                      {item.category}
+                    </span>
+                  )}
+                  <p className="text-[13px] font-semibold leading-snug">{item.alt}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8">
+            <Link
+              href="/gallery"
+              className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#1d4ed8] transition hover:text-[#3b6cb7] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
+            >
+              View full gallery
+              <ArrowRight size={16} />
+            </Link>
           </div>
         </div>
       </section>

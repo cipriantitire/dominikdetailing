@@ -2,7 +2,7 @@ import 'server-only'
 import { NextResponse } from 'next/server'
 import { listBookingRequests, getBookingRequestById } from '../../../../lib/supabase/adminReads'
 import { updateBookingRequest } from '../../../../lib/supabase/adminMutations'
-import { buildReviewTemplateVars } from '../../../../lib/email/templateVars'
+import { buildReviewTemplateVars, buildDeclinedTemplateVars } from '../../../../lib/email/templateVars'
 import { sendResendTemplate } from '../../../../lib/email/sendTemplate'
 import { z } from 'zod'
 import { isAdminAuthorized } from '../../../../lib/auth/admin'
@@ -101,7 +101,7 @@ export async function PATCH(req: Request) {
         if (newStatus === 'declined') {
           const TEMPLATE_ID = process.env.RESEND_TEMPLATE_BOOKING_DECLINED
           if (TEMPLATE_ID) {
-            const vars = buildReviewTemplateVars(updated, process.env.NEXT_PUBLIC_SITE_URL)
+            const vars = buildDeclinedTemplateVars(updated, process.env.NEXT_PUBLIC_SITE_URL)
             const from = process.env.RESEND_BOOKINGS_FROM_EMAIL ?? process.env.RESEND_FROM_EMAIL
             await sendResendTemplate({ templateId: TEMPLATE_ID, from: from ?? null, to: updated.customer_email, variables: vars, replyTo: process.env.RESEND_REPLY_FROM_EMAIL })
           }

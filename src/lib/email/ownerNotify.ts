@@ -35,7 +35,6 @@ export async function sendOwnerNotification(id: string, payload: OwnerNotifyPayl
   const OWNER_NOTIFICATION_EMAIL = process.env.OWNER_NOTIFICATION_EMAIL
   const ADMIN_EMAIL = process.env.ADMIN_EMAIL
   const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL
-  // New per-sender envs
   const RESEND_ALERTS_FROM_EMAIL = process.env.RESEND_ALERTS_FROM_EMAIL
   const RESEND_REPLY_FROM_EMAIL = process.env.RESEND_REPLY_FROM_EMAIL
 
@@ -51,7 +50,7 @@ export async function sendOwnerNotification(id: string, payload: OwnerNotifyPayl
 
   const subject = `New booking request — ${payload.customerName}`
 
-  const adminLink = SITE_URL ? `${SITE_URL.replace(/\/$/, '')}/admin/bookings?id=${encodeURIComponent(id)}` : undefined
+  const adminLink = SITE_URL ? `${SITE_URL.replace(/\/$/, '')}/admin/bookings/${encodeURIComponent(id)}` : undefined
 
   const html = `
     <div style="font-family:system-ui,Arial;line-height:1.4;color:#111">

@@ -34,19 +34,21 @@ export async function sendResendTemplate(opts: SendTemplateOpts) {
 
   try {
     const resend = new Resend(apiKey)
-    const sendOpts: Parameters<Resend['emails']['send']>[0] = {
+    const sendOpts: Parameters<Resend['emails']['send']>[0] & {
+      template?: { id: string; variables?: Record<string, string | number> }
+    } = {
       from: from ?? undefined,
       to,
-      // Use template rendering by template id and pass variables. The SDK
-      // typings in this repo may not include these fields so use ts-expect-error
-      // for the strongly typed call site.
-      // @ts-expect-error - 'template' and 'variables' are supported by Resend runtime
-      template: templateId,
+      template: { id: templateId },
     }
 
     if (variables) {
-      // @ts-expect-error - allow template variables despite local typings
-      sendOpts.variables = variables
+      sendOpts.template = {
+        id: templateId,
+        variables: Object.fromEntries(
+          Object.entries(variables).map(([key, value]) => [key, typeof value === 'number' ? value : String(value)]),
+        ),
+      }
     }
 
     if (replyTo) {
@@ -58,7 +60,7 @@ export async function sendResendTemplate(opts: SendTemplateOpts) {
       sendOpts.subject = subjectFallback
     }
 
-    await resend.emails.send(sendOpts)
+    await resend.emails.send(sendOpts as Parameters<Resend['emails']['send']>[0])
   } catch (err: unknown) {
     // Keep logs generic and avoid exposing secrets
     let message = String(err)
