@@ -32,3 +32,5 @@ next-env.d.ts
 Thumbs.db
 
 .env.example
+docs/images
+.env.example

@@ -1,6 +1,8 @@
 import 'server-only'
 import { Resend } from 'resend'
 import { serviceTiers, serviceExtras } from '../../config/services'
+import { buildRequestedTemplateVars } from './templateVars'
+import { sendResendTemplate } from './sendTemplate'
 
 function escapeHtml(input: unknown) {
   if (input === undefined || input === null) return ''
@@ -85,13 +87,40 @@ export async function sendOwnerNotification(id: string, payload: OwnerNotifyPayl
     .join('\n')
 
   try {
-    const resend = new Resend(RESEND_API_KEY)
+    // If a Resend template ID is configured prefer sending the template. This
+    // allows marketing/HTML templates to be maintained in the Resend dashboard.
+    const TEMPLATE_ID = process.env.RESEND_TEMPLATE_OWNER_NEW_BOOKING
     const from = RESEND_ALERTS_FROM_EMAIL ?? process.env.RESEND_FROM_EMAIL ?? ADMIN_EMAIL
     if (!from) {
       console.warn('Owner notification: RESEND_ALERTS_FROM_EMAIL or RESEND_FROM_EMAIL or ADMIN_EMAIL must be configured')
       return
     }
 
+    if (TEMPLATE_ID) {
+      // Build template variables and send via template API. Failures are logged
+      // inside sendResendTemplate and will not throw here.
+      const vars = buildRequestedTemplateVars(
+        {
+          id,
+          requested_date: payload.requestedDate,
+          requested_time: payload.requestedTime,
+          requested_service: payload.requestedService,
+          customer_name: payload.customerName,
+          customer_phone: payload.customerPhone,
+          customer_email: payload.customerEmail,
+          address: payload.address,
+          postcode: payload.postcode,
+          selected_extras: payload.selectedExtras ?? null,
+          notes: payload.notes,
+        },
+        SITE_URL,
+      )
+      await sendResendTemplate({ templateId: TEMPLATE_ID, from, to: OWNER_NOTIFICATION_EMAIL, variables: vars, replyTo: RESEND_REPLY_FROM_EMAIL, subjectFallback: subject })
+      return
+    }
+
+    // Fallback to inline HTML send if no template configured
+    const resend = new Resend(RESEND_API_KEY)
     const sendOpts: Parameters<Resend['emails']['send']>[0] = {
       from,
       to: OWNER_NOTIFICATION_EMAIL,

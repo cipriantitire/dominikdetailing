@@ -4,6 +4,8 @@ import { bookingSchema, PublicBookingRequestInput } from '../../../lib/validatio
 import { supabaseAdmin } from '../../../lib/supabase/server'
 import { ZodError } from 'zod'
 import { sendOwnerNotification } from '../../../lib/email/ownerNotify'
+import { buildRequestedTemplateVars } from '../../../lib/email/templateVars'
+import { sendResendTemplate } from '../../../lib/email/sendTemplate'
 
 import { isLimited } from '../../../lib/rateLimiter'
 
@@ -81,6 +83,33 @@ export async function POST(req: Request) {
     } catch {
       // sendOwnerNotification already logs errors; keep this catch in case of unexpected failures
       console.error('Owner notification attempt failed', { bookingId: data.id })
+    }
+
+    // Optionally send a customer-facing "request received" template if configured
+    try {
+      const TEMPLATE_ID = process.env.RESEND_TEMPLATE_BOOKING_REQUEST_RECEIVED
+      if (TEMPLATE_ID && parsed.customerEmail) {
+        const vars = buildRequestedTemplateVars(
+          {
+            id: data.id,
+            requested_date: parsed.requestedDate,
+            requested_time: parsed.requestedTime,
+            requested_service: parsed.requestedService,
+            customer_name: parsed.customerName,
+            customer_email: parsed.customerEmail,
+            address: parsed.address,
+            postcode: parsed.postcode ?? null,
+            selected_extras: parsed.selectedExtras ?? null,
+            notes: parsed.notes ?? null,
+          },
+          process.env.NEXT_PUBLIC_SITE_URL,
+        )
+
+        const from = process.env.RESEND_BOOKINGS_FROM_EMAIL ?? process.env.RESEND_FROM_EMAIL
+        await sendResendTemplate({ templateId: TEMPLATE_ID, from: from ?? null, to: parsed.customerEmail, variables: vars, replyTo: process.env.RESEND_REPLY_FROM_EMAIL })
+      }
+    } catch (e) {
+      console.error('Failed to send booking request received email', { bookingId: data.id, message: String(e) })
     }
 
     return NextResponse.json({ ok: true, id: data?.id }, { status: 201 })

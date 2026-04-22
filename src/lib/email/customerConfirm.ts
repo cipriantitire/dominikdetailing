@@ -1,6 +1,8 @@
 import 'server-only'
 import { Resend } from 'resend'
 import { serviceTiers, serviceExtras } from '../../config/services'
+import { buildConfirmedTemplateVars } from './templateVars'
+import { sendResendTemplate } from './sendTemplate'
 
 function escapeHtml(input: unknown) {
   if (input === undefined || input === null) return ''
@@ -75,14 +77,36 @@ export async function sendCustomerConfirmationEmail(payload: CustomerConfirmPayl
     .join('\n')
 
   try {
-    const resend = new Resend(RESEND_API_KEY)
-    // Resend requires `to` to be a string or array of strings. If customerEmail is missing,
-    // skip sending the email.
+    // If no customer email is provided, skip sending
     if (!payload.customerEmail) {
       console.info('Customer confirmation: no customer email provided, skipping send')
       return
     }
 
+    const TEMPLATE_ID = process.env.RESEND_TEMPLATE_BOOKING_CONFIRMED
+    if (TEMPLATE_ID) {
+      const vars = buildConfirmedTemplateVars(
+        {
+          id: payload.id,
+          customer_name: payload.customerName,
+          customer_email: payload.customerEmail,
+          customer_phone: payload.customerPhone,
+          address: payload.address,
+          postcode: payload.postcode,
+          serviceId: payload.serviceId,
+          service_id: payload.serviceId,
+          confirmed_start_at: payload.confirmedStartAt,
+          confirmed_end_at: payload.confirmedEndAt,
+          selected_extras: payload.selectedExtras ?? null,
+          notes: payload.notes,
+        },
+        process.env.NEXT_PUBLIC_SITE_URL,
+      )
+      await sendResendTemplate({ templateId: TEMPLATE_ID, from: fromEmail, to: payload.customerEmail, variables: vars, replyTo: RESEND_REPLY_FROM_EMAIL, subjectFallback: subject })
+      return
+    }
+
+    const resend = new Resend(RESEND_API_KEY)
     const sendOpts: Parameters<Resend['emails']['send']>[0] = {
       from: fromEmail,
       to: payload.customerEmail,

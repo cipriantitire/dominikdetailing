@@ -1,3 +1,12 @@
+const serviceImagePaths = {
+  'premium-detailing': '/service-images/Premium%20Detailing.png',
+  'full-valet': '/service-images/Full%20Valet.png',
+  'mini-valet': '/service-images/Mini%20Valet.png',
+  'machine-polish': '/service-images/Machine%20Polish.png',
+  'ceramic-coating': '/service-images/Ceramic%20Coating.png',
+  'maintenance-wash': '/service-images/Maintenance%20Wash.png',
+} as const;
+
 export const serviceTiers = [
   {
     id: "premium-detailing",
@@ -11,8 +20,7 @@ export const serviceTiers = [
       "Engine bay cleaning",
       "Tyres dressed & rim care",
     ],
-    image:
-      "https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&w=800&q=80",
+    image: serviceImagePaths["premium-detailing"],
     popular: true,
   },
   {
@@ -27,8 +35,7 @@ export const serviceTiers = [
       "Dashboard, console and panels detailed",
       "Exterior wash with tyre and trim finish",
     ],
-    image:
-      "https://images.unsplash.com/photo-1552930294-6b595f4c2974?auto=format&fit=crop&w=800&q=80",
+    image: serviceImagePaths["full-valet"],
     popular: false,
   },
   {
@@ -43,8 +50,7 @@ export const serviceTiers = [
       "Windows cleaned inside and out",
       "Tyres dressed for a clean finish",
     ],
-    image:
-      "https://images.unsplash.com/photo-1520340356584-391a6c0cdc4d?auto=format&fit=crop&w=800&q=80",
+    image: serviceImagePaths["mini-valet"],
     popular: false,
   },
   {
@@ -59,8 +65,7 @@ export const serviceTiers = [
       "Gloss and depth significantly improved",
       "Protection applied after correction",
     ],
-    image:
-      "https://images.unsplash.com/photo-1610555356070-d0efb6505f81?auto=format&fit=crop&w=800&q=80",
+    image: serviceImagePaths["machine-polish"],
     popular: false,
   },
   {
@@ -75,8 +80,7 @@ export const serviceTiers = [
       "Improved gloss and slick finish",
       "Long-lasting protection for painted surfaces",
     ],
-    image:
-      "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=800&q=80",
+    image: serviceImagePaths["ceramic-coating"],
     popular: false,
   },
   {
@@ -91,13 +95,28 @@ export const serviceTiers = [
       "Light interior vacuum and wipe-down",
       "Perfect for returning clients and regular care",
     ],
-    image:
-      "https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&w=800&q=80",
+    image: serviceImagePaths["maintenance-wash"],
     popular: false,
   },
 ] as const;
 
 export type ServiceTier = (typeof serviceTiers)[number]["id"];
+
+export function getServiceTierById(id: string) {
+  return serviceTiers.find((service) => service.id === id);
+}
+
+export function getServiceImagePath(serviceId: string) {
+  return getServiceTierById(serviceId)?.image ?? '';
+}
+
+export function getServiceImageUrl(serviceId: string, siteUrl?: string | null) {
+  const imagePath = getServiceImagePath(serviceId);
+  if (!imagePath) return '';
+  if (/^https?:\/\//.test(imagePath)) return imagePath;
+  if (!siteUrl) return imagePath;
+  return `${siteUrl.replace(/\/$/, '')}${imagePath}`;
+}
 
 export const serviceExtras = [
   { id: "clay-bar", name: "Clay Bar Decontamination", price: 39 },

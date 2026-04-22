@@ -2,6 +2,8 @@ import 'server-only'
 import { NextResponse } from 'next/server'
 import { listBookingRequests, getBookingRequestById } from '../../../../lib/supabase/adminReads'
 import { updateBookingRequest } from '../../../../lib/supabase/adminMutations'
+import { buildReviewTemplateVars } from '../../../../lib/email/templateVars'
+import { sendResendTemplate } from '../../../../lib/email/sendTemplate'
 import { z } from 'zod'
 import { isAdminAuthorized } from '../../../../lib/auth/admin'
 
@@ -76,7 +78,39 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ ok: false, error: 'No update fields provided' }, { status: 400 })
     }
 
+    // Load previous booking to detect status transitions
+    const before = await getBookingRequestById(id)
+
     const updated = await updateBookingRequest(id, updates)
+
+    try {
+      const prevStatus = before?.status
+      const newStatus = updated?.status
+      if (prevStatus !== newStatus && updated?.customer_email) {
+        // Under review
+        if (newStatus === 'reviewing') {
+          const TEMPLATE_ID = process.env.RESEND_TEMPLATE_BOOKING_UNDER_REVIEW
+          if (TEMPLATE_ID) {
+            const vars = buildReviewTemplateVars(updated, process.env.NEXT_PUBLIC_SITE_URL)
+            const from = process.env.RESEND_BOOKINGS_FROM_EMAIL ?? process.env.RESEND_FROM_EMAIL
+            await sendResendTemplate({ templateId: TEMPLATE_ID, from: from ?? null, to: updated.customer_email, variables: vars, replyTo: process.env.RESEND_REPLY_FROM_EMAIL })
+          }
+        }
+
+        // Declined
+        if (newStatus === 'declined') {
+          const TEMPLATE_ID = process.env.RESEND_TEMPLATE_BOOKING_DECLINED
+          if (TEMPLATE_ID) {
+            const vars = buildReviewTemplateVars(updated, process.env.NEXT_PUBLIC_SITE_URL)
+            const from = process.env.RESEND_BOOKINGS_FROM_EMAIL ?? process.env.RESEND_FROM_EMAIL
+            await sendResendTemplate({ templateId: TEMPLATE_ID, from: from ?? null, to: updated.customer_email, variables: vars, replyTo: process.env.RESEND_REPLY_FROM_EMAIL })
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Failed to send status transition email', { bookingId: id, message: String(e) })
+    }
+
     return NextResponse.json({ ok: true, booking: updated })
   } catch (err) {
     console.error('Admin update error', err)
