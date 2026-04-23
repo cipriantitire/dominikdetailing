@@ -21,6 +21,7 @@ export default function BeforeAfterSlider({
   const [pos, setPos] = useState(50);
   const [dragging, setDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const gestureLockedRef = useRef(false);
 
   const updatePos = useCallback((clientX: number) => {
     const rect = containerRef.current?.getBoundingClientRect();
@@ -30,19 +31,57 @@ export default function BeforeAfterSlider({
   }, []);
 
   const onPointerDown = (e: React.PointerEvent) => {
-    setDragging(true);
+    gestureLockedRef.current = false;
     try {
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     } catch {}
-    updatePos(e.clientX);
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!dragging) return;
-    updatePos(e.clientX);
+    if (!containerRef.current) return;
+
+    // Gesture-direction detection (same pattern as DomeGallery)
+    if (!gestureLockedRef.current) {
+      const dx = Math.abs(e.clientX - (containerRef.current.dataset.startX ? Number(containerRef.current.dataset.startX) : e.clientX));
+      const dy = Math.abs(e.clientY - (containerRef.current.dataset.startY ? Number(containerRef.current.dataset.startY) : e.clientY));
+      const dist2 = dx * dx + dy * dy;
+      if (dist2 < 100) {
+        // Not enough movement yet — store start if first move
+        if (!containerRef.current.dataset.startX) {
+          containerRef.current.dataset.startX = String(e.clientX);
+          containerRef.current.dataset.startY = String(e.clientY);
+        }
+        return;
+      }
+      gestureLockedRef.current = true;
+      if (dy > dx) {
+        // Vertical gesture → page scroll, abandon slider drag
+        containerRef.current.removeAttribute("data-startX");
+        containerRef.current.removeAttribute("data-startY");
+        try {
+          (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+        } catch {}
+        return;
+      }
+      // Horizontal gesture confirmed → start sliding
+      setDragging(true);
+      updatePos(e.clientX);
+      return;
+    }
+
+    if (dragging) {
+      updatePos(e.clientX);
+    }
   };
 
-  const onPointerUp = () => setDragging(false);
+  const onPointerUp = () => {
+    setDragging(false);
+    gestureLockedRef.current = false;
+    if (containerRef.current) {
+      containerRef.current.removeAttribute("data-startX");
+      containerRef.current.removeAttribute("data-startY");
+    }
+  };
 
   const beforeOpacity = Math.min(1, pos / 20);
   const afterOpacity = Math.min(1, (100 - pos) / 20);
@@ -55,7 +94,7 @@ export default function BeforeAfterSlider({
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
-      style={{ touchAction: "none" }}
+      style={{ touchAction: "pan-y" }}
     >
       {/* Before image (full background) */}
       <Image
