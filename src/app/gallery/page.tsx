@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
 import DomeGallery from "@/components/gallery/DomeGallery";
+import BeforeAfterSlider from "@/components/gallery/BeforeAfterSlider";
 import { galleryItems } from "@/config/gallery";
 
 export default function GalleryPage() {
@@ -86,30 +86,35 @@ export default function GalleryPage() {
                 </Link>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              {[galleryItems[0], galleryItems[4], galleryItems[1], galleryItems[8]].map((item) => (
-                <div
-                  key={item.src}
-                  className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-white/[0.04]"
-                >
-                  <Image
-                    src={item.src}
-                    alt={item.alt}
-                    fill
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                    className="object-cover transition duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-0 left-0 p-4">
-                    {item.category && (
-                      <span className="mb-1 inline-block rounded bg-[#c5a059]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#c5a059]">
-                        {item.category}
-                      </span>
-                    )}
-                    <p className="text-[12px] font-semibold leading-snug">{item.alt}</p>
-                  </div>
-                </div>
-              ))}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <BeforeAfterSlider
+                beforeSrc={galleryItems[0].src}
+                afterSrc={galleryItems[1].src}
+                beforeAlt={galleryItems[0].alt}
+                afterAlt={galleryItems[1].alt}
+                className="aspect-[4/3] w-full"
+              />
+              <BeforeAfterSlider
+                beforeSrc={galleryItems[2].src}
+                afterSrc={galleryItems[3].src}
+                beforeAlt={galleryItems[2].alt}
+                afterAlt={galleryItems[3].alt}
+                className="aspect-[4/3] w-full"
+              />
+              <BeforeAfterSlider
+                beforeSrc={galleryItems[4].src}
+                afterSrc={galleryItems[5].src}
+                beforeAlt={galleryItems[4].alt}
+                afterAlt={galleryItems[5].alt}
+                className="aspect-[4/3] w-full"
+              />
+              <BeforeAfterSlider
+                beforeSrc={galleryItems[6].src}
+                afterSrc={galleryItems[7].src}
+                beforeAlt={galleryItems[6].alt}
+                afterAlt={galleryItems[7].alt}
+                className="aspect-[4/3] w-full"
+              />
             </div>
           </div>
         </section>

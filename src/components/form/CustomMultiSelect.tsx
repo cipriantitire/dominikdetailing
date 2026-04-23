@@ -36,14 +36,14 @@ export default function CustomMultiSelect({
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handlePointerDown = (e: PointerEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         close();
       }
     };
     if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      document.addEventListener("pointerdown", handlePointerDown);
+      return () => document.removeEventListener("pointerdown", handlePointerDown);
     }
   }, [open, close]);
 
@@ -135,7 +135,10 @@ export default function CustomMultiSelect({
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1.5 w-full rounded-lg border border-white/[0.06] bg-[#0f0f14] shadow-xl shadow-black/40 overflow-hidden">
+        <div
+          onPointerDown={(e) => e.stopPropagation()}
+          className="absolute z-50 mt-1.5 w-full rounded-lg border border-white/[0.06] bg-[#0f0f14] shadow-xl shadow-black/40 overflow-hidden"
+        >
           <div ref={listRef} role="listbox" className="max-h-60 overflow-auto py-1">
             {options.map((option, index) => {
               const isSelected = value.includes(option.value);

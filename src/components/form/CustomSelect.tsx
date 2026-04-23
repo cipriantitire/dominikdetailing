@@ -59,14 +59,14 @@ export default function CustomSelect({
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handlePointerDown = (e: PointerEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         close();
       }
     };
     if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      document.addEventListener("pointerdown", handlePointerDown);
+      return () => document.removeEventListener("pointerdown", handlePointerDown);
     }
   }, [open, close]);
 
@@ -139,7 +139,8 @@ export default function CustomSelect({
 
   const dropdown = open && pos && (
     <div
-      className="fixed z-[60] rounded-lg border border-white/[0.06] bg-[#0f0f14] shadow-xl shadow-black/40 overflow-hidden"
+      onPointerDown={(e) => e.stopPropagation()}
+      className="absolute z-[60] rounded-lg border border-white/[0.06] bg-[#0f0f14] shadow-xl shadow-black/40 overflow-hidden"
       style={{ top: pos.top, left: pos.left, width: pos.width }}
     >
       <div ref={listRef} role="listbox" className="max-h-60 overflow-auto py-1">
@@ -152,6 +153,7 @@ export default function CustomSelect({
               role="option"
               aria-selected={isSelected}
               onMouseEnter={() => setHighlightedIndex(index)}
+              onTouchStart={() => setHighlightedIndex(index)}
               onClick={() => {
                 onChange(option.value);
                 close();

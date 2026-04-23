@@ -80,14 +80,14 @@ export default function CustomCalendar({
   const close = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handlePointerDown = (e: PointerEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         close();
       }
     };
     if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      document.addEventListener("pointerdown", handlePointerDown);
+      return () => document.removeEventListener("pointerdown", handlePointerDown);
     }
   }, [open, close]);
 
@@ -183,7 +183,8 @@ export default function CustomCalendar({
 
   const dropdown = open && pos && (
     <div
-      className="fixed z-[60] rounded-lg border border-white/[0.06] bg-[#0f0f14] shadow-xl shadow-black/40 overflow-hidden p-3"
+      onPointerDown={(e) => e.stopPropagation()}
+      className="absolute z-[60] rounded-lg border border-white/[0.06] bg-[#0f0f14] shadow-xl shadow-black/40 overflow-hidden p-3"
       style={{ top: pos.top, left: pos.left, width: 280 }}
     >
       {/* Header */}
