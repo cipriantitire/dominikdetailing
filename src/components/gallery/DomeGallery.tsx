@@ -39,7 +39,7 @@ const DEFAULT_IMAGES: DomeGalleryImage[] = [
 
 const DEFAULTS = {
   maxVerticalRotationDeg: 5,
-  dragSensitivity: 20,
+  dragSensitivity: 4,
   enlargeTransitionMs: 300,
   segments: 35,
 } as const;
@@ -435,11 +435,11 @@ export default function DomeGallery({
     let startRot = { x: 0, y: 0 };
     let isDragging = false;
     let hasMoved = false;
+    let gestureLocked = false;
     let lastX = 0;
     let lastY = 0;
     let lastTime = 0;
     let velocityX = 0;
-    let velocityY = 0;
     let pointerOnDome = false;
 
     const onPointerDown = (e: PointerEvent) => {
@@ -449,6 +449,7 @@ export default function DomeGallery({
       isDragging = true;
       pointerOnDome = true;
       hasMoved = false;
+      gestureLocked = false;
       startX = e.clientX;
       startY = e.clientY;
       startRot = { ...rotationRef.current };
@@ -456,7 +457,6 @@ export default function DomeGallery({
       lastY = e.clientY;
       lastTime = performance.now();
       velocityX = 0;
-      velocityY = 0;
       draggingRef.current = true;
       movedRef.current = false;
       rootRef.current?.setAttribute("data-dragging", "true");
@@ -470,36 +470,41 @@ export default function DomeGallery({
     const onPointerMove = (e: PointerEvent) => {
       if (!isDragging || focusedElRef.current) return;
 
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
+      const dxTotal = e.clientX - startX;
+      const dyTotal = e.clientY - startY;
 
-      if (!hasMoved) {
-        const dist2 = dx * dx + dy * dy;
-        if (dist2 > 16) {
-          hasMoved = true;
-          movedRef.current = true;
+      if (!gestureLocked) {
+        const dist2 = dxTotal * dxTotal + dyTotal * dyTotal;
+        if (dist2 < 100) return; // wait for 10px to decide direction
+        gestureLocked = true;
+        if (Math.abs(dyTotal) > Math.abs(dxTotal)) {
+          // Vertical gesture → page scroll, abandon dome drag
+          isDragging = false;
+          pointerOnDome = false;
+          draggingRef.current = false;
+          rootRef.current?.removeAttribute("data-dragging");
+          try {
+            el.releasePointerCapture(e.pointerId);
+          } catch {}
+          return;
         }
+        // Horizontal gesture confirmed
+        hasMoved = true;
+        movedRef.current = true;
       }
 
       const now = performance.now();
       const dt = now - lastTime;
       if (dt > 0) {
         velocityX = (e.clientX - lastX) / dt;
-        velocityY = (e.clientY - lastY) / dt;
       }
       lastX = e.clientX;
       lastY = e.clientY;
       lastTime = now;
 
-      const nextX = clamp(
-        startRot.x - dy / dragSensitivity,
-        -maxVerticalRotationDeg,
-        maxVerticalRotationDeg
-      );
-      const nextY = wrapAngleSigned(startRot.y + dx / dragSensitivity);
-
-      rotationRef.current = { x: nextX, y: nextY };
-      applyTransform(nextX, nextY);
+      const nextY = wrapAngleSigned(startRot.y + dxTotal / dragSensitivity);
+      rotationRef.current = { x: 0, y: nextY };
+      applyTransform(0, nextY);
     };
 
     const onPointerUp = (e: PointerEvent) => {
@@ -511,24 +516,23 @@ export default function DomeGallery({
       rootRef.current?.removeAttribute("data-dragging");
 
       if (hasMoved) {
-        // Drag ended → inertia
+        // Drag ended → horizontal inertia only
         lastDragEndAt.current = performance.now();
-        const vx = velocityX * 0.015;
-        const vy = velocityY * 0.015;
-        if (Math.abs(vx) > 0.005 || Math.abs(vy) > 0.005) {
-          startInertia(vx, vy);
+        const vx = velocityX * 0.2;
+        if (Math.abs(vx) > 0.005) {
+          startInertia(vx, 0);
         }
       } else {
         // Tap → open tile or close enlarged image
         if (focusedElRef.current) {
-          const target = e.target as HTMLElement;
-          const isEnlargedImage = target.closest(".enlarge") !== null;
+          const target = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+          const isEnlargedImage = target?.closest(".enlarge") != null;
           if (!isEnlargedImage && scrimRef.current) {
             scrimRef.current.dispatchEvent(new MouseEvent("click", { bubbles: true }));
           }
         } else {
-          const target = e.target as HTMLElement;
-          const tile = target.closest(".item__image") as HTMLDivElement | null;
+          const target = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+          const tile = target?.closest(".item__image") as HTMLDivElement | null;
           if (tile && !openingRef.current) {
             openItemFromElement(tile);
           }
@@ -537,6 +541,7 @@ export default function DomeGallery({
 
       hasMoved = false;
       movedRef.current = false;
+      gestureLocked = false;
     };
 
     const onPointerCancel = () => {
@@ -547,6 +552,7 @@ export default function DomeGallery({
       rootRef.current?.removeAttribute("data-dragging");
       hasMoved = false;
       movedRef.current = false;
+      gestureLocked = false;
     };
 
     el.addEventListener("pointerdown", onPointerDown);
@@ -675,6 +681,26 @@ export default function DomeGallery({
     },
     [openItemFromElement]
   );
+
+  // Idle auto-rotation
+  useEffect(() => {
+    let rafId: number;
+    const AUTO_ROTATE_SPEED = 0.035;
+    const loop = () => {
+      if (
+        !draggingRef.current &&
+        !inertiaRAF.current &&
+        !openingRef.current &&
+        !focusedElRef.current
+      ) {
+        rotationRef.current.y = wrapAngleSigned(rotationRef.current.y + AUTO_ROTATE_SPEED);
+        applyTransform(0, rotationRef.current.y);
+      }
+      rafId = requestAnimationFrame(loop);
+    };
+    rafId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafId);
+  }, [applyTransform]);
 
   useEffect(() => {
     return () => {

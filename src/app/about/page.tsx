@@ -12,12 +12,12 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-[#09090d] text-white">
       <SiteHeader />
-      <main className="mx-auto max-w-7xl px-4 py-20 md:px-6 md:py-24">
+      <main className="mx-auto max-w-7xl px-4 pt-12 pb-20 md:px-6 md:pt-[70px] md:pb-24">
         <div className="text-center">
           <span className="text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
             Our Story
           </span>
-          <h1 className="mt-3 text-[32px] font-bold tracking-tight md:text-[48px]">
+          <h1 className="mt-3 text-[32px] font-bold tracking-tight text-balance md:text-[48px]">
             About <span className="text-[#1d4ed8]">Dominik Detailing</span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed text-[#686878]">
@@ -36,7 +36,7 @@ export default function AboutPage() {
             />
           </div>
           <div>
-            <h2 className="text-[24px] font-bold tracking-tight md:text-[32px]">
+            <h2 className="text-[24px] font-bold tracking-tight text-balance md:text-[32px]">
               Mobile detailing done properly
             </h2>
             <p className="mt-5 text-[14px] leading-relaxed text-[#686878]">
@@ -47,15 +47,15 @@ export default function AboutPage() {
             </p>
             <div className="mt-8 grid grid-cols-3 gap-6">
               <div className="text-center">
-                <p className="text-[28px] font-bold text-[#1d4ed8]">5+</p>
+                <p className="text-[28px] font-bold text-[#1d4ed8] tabular-nums">5+</p>
                 <p className="mt-1 text-[11px] uppercase tracking-wider text-[#686878]">Years Experience</p>
               </div>
               <div className="text-center">
-                <p className="text-[28px] font-bold text-[#1d4ed8]">500+</p>
+                <p className="text-[28px] font-bold text-[#1d4ed8] tabular-nums">500+</p>
                 <p className="mt-1 text-[11px] uppercase tracking-wider text-[#686878]">Cars Detailed</p>
               </div>
               <div className="text-center">
-                <p className="text-[28px] font-bold text-[#1d4ed8]">100%</p>
+                <p className="text-[28px] font-bold text-[#1d4ed8] tabular-nums">100%</p>
                 <p className="mt-1 text-[11px] uppercase tracking-wider text-[#686878]">Satisfaction</p>
               </div>
             </div>
@@ -85,20 +85,20 @@ export default function AboutPage() {
         </div>
 
         <div className="mt-16 text-center">
-          <h2 className="text-[24px] font-bold tracking-tight md:text-[32px]">
+          <h2 className="text-[24px] font-bold tracking-tight text-balance md:text-[32px]">
             Ready to experience the difference?
           </h2>
           <div className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/book"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-8 py-3.5 text-[13px] font-bold text-white transition hover:bg-[#1e40af] active:scale-[0.98]"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-8 py-3.5 text-[13px] font-bold text-white transition-[colors,transform] hover:bg-[#1e40af] active:scale-[0.96]"
             >
               Request a Quote
               <ArrowRight size={16} />
             </Link>
             <a
               href={siteConfig.phoneHref}
-              className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-8 py-3.5 text-[13px] font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.03]"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-8 py-3.5 text-[13px] font-semibold text-white transition-[colors,transform,border-color] hover:border-white/20 hover:bg-white/[0.03] active:scale-[0.96]"
             >
               <Phone size={16} />
               Call {siteConfig.phone}

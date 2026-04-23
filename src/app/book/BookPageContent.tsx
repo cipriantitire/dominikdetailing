@@ -11,6 +11,9 @@ import { serviceTiers, serviceExtras, timeWindows } from "@/config/services";
 import { siteConfig } from "@/config/site";
 import SiteHeader from "@/components/layout/SiteHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
+import CustomSelect from "@/components/form/CustomSelect";
+import CustomMultiSelect from "@/components/form/CustomMultiSelect";
+import CustomCalendar from "@/components/form/CustomCalendar";
 import { bookingSchema } from "@/lib/validations/booking";
 import { isValidUkPostcode, normalizeUkPostcode } from "@/lib/location/ukPostcode";
 import {
@@ -26,7 +29,6 @@ import {
 } from "@untitledui/icons";
 
 const bookingFormSchema = bookingSchema.extend({
-  keyCollectionSame: z.literal("on").optional(),
   discountCode: z.string().max(50).optional(),
 });
 
@@ -85,6 +87,7 @@ export default function BookPageContent() {
   const [postcodeLookupMessage, setPostcodeLookupMessage] = useState("");
   const [postcodeContext, setPostcodeContext] = useState<PostcodeContext | null>(null);
   const [mapEmbedSrc, setMapEmbedSrc] = useState(DEFAULT_MAP_EMBED_SRC);
+  const [keyCollectionSame, setKeyCollectionSame] = useState(true);
 
   const {
     register,
@@ -97,16 +100,20 @@ export default function BookPageContent() {
     resolver: zodResolver(bookingFormSchema),
     defaultValues: {
       selectedExtras: [],
-      keyCollectionSame: "on",
       requestedService: searchParams.get("service") || "",
       postcode: searchParams.get("postcode") || "",
       requestedDate: searchParams.get("date") || "",
       requestedTime: searchParams.get("time") || "",
     },
   });
-
-  const keyCollectionSame = useWatch({ control, name: "keyCollectionSame" }) === "on";
   const selectedExtras = useWatch({ control, name: "selectedExtras", defaultValue: [] }) || [];
+  const requestedServiceValue = useWatch({ control, name: "requestedService", defaultValue: "" }) || "";
+  const requestedDateValue = useWatch({ control, name: "requestedDate", defaultValue: "" }) || "";
+  const requestedTimeValue = useWatch({ control, name: "requestedTime", defaultValue: "" }) || "";
+
+  const serviceOptions = serviceTiers.map((t) => ({ value: t.id, label: t.name }));
+  const timeOptions = timeWindows.map((tw) => ({ value: tw, label: tw }));
+  const extraOptions = serviceExtras.map((e) => ({ value: e.id, label: `${e.name} (+£${e.price})` }));
 
   useEffect(() => {
     const service = searchParams.get("service");
@@ -200,19 +207,6 @@ export default function BookPageContent() {
     }
   };
 
-  const toggleExtra = (id: string) => {
-    const current = selectedExtras;
-    if (current.includes(id)) {
-      setValue(
-        "selectedExtras",
-        current.filter((x) => x !== id),
-        { shouldValidate: true, shouldDirty: true }
-      );
-    } else {
-      setValue("selectedExtras", [...current, id], { shouldValidate: true, shouldDirty: true });
-    }
-  };
-
   const onSubmit = async (data: BookingFormData) => {
     setSubmitting(true);
     setSubmitError("");
@@ -260,7 +254,7 @@ export default function BookPageContent() {
   const minDate = tomorrow.toISOString().split("T")[0];
 
   const inputBase =
-    "w-full rounded-lg border border-white/[0.06] bg-[#0a0a0f] px-3.5 py-2.5 text-[13px] text-white placeholder:text-[#484855] outline-none transition focus:border-[#1d4ed8]/50 focus:ring-1 focus:ring-[#1d4ed8]/20 focus:bg-[#141419]";
+    "w-full rounded-lg border border-white/[0.06] bg-[#0a0a0f] px-3.5 py-2.5 text-[13px] text-white placeholder:text-[#484855] outline-none transition hover:bg-[#141419] focus:bg-[#141419] focus:border-transparent";
   const labelBase = "block text-[12px] font-semibold text-[#9696a3]";
   const errorBase = "mt-1 text-[11px] text-[#dc2626]";
 
@@ -272,7 +266,7 @@ export default function BookPageContent() {
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#22c55e]/10 text-[#22c55e]">
             <CheckVerified02 size={32} />
           </div>
-          <h1 className="mt-6 text-[32px] font-bold tracking-tight md:text-[40px]">
+          <h1 className="mt-6 text-[32px] font-bold tracking-tight text-balance md:text-[40px]">
             Request Received
           </h1>
           <p className="mt-4 text-[14px] leading-relaxed text-[#686878]">
@@ -281,7 +275,7 @@ export default function BookPageContent() {
           <div className="mt-8 flex flex-col gap-4 sm:flex-row">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-6 py-3 text-[13px] font-semibold text-white transition hover:bg-[#1e40af]"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-6 py-3 text-[13px] font-semibold text-white transition-[colors,transform] hover:bg-[#1e40af] active:scale-[0.96]"
             >
               Back to Home
             </Link>
@@ -289,7 +283,7 @@ export default function BookPageContent() {
               href={siteConfig.whatsapp}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-6 py-3 text-[13px] font-semibold text-white transition hover:border-white/20"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-6 py-3 text-[13px] font-semibold text-white transition-[colors,transform,border-color] hover:border-white/20 active:scale-[0.96]"
             >
               <MessageChatSquare size={16} />
               Message on WhatsApp
@@ -310,7 +304,7 @@ export default function BookPageContent() {
   return (
     <div className="min-h-screen bg-[#09090d] text-white">
       <SiteHeader />
-      <main className="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-14">
+      <main className="mx-auto max-w-7xl px-4 pt-12 pb-10 md:px-6 md:pt-[70px] md:pb-14">
         <div className="mb-8">
           <Link
             href="/"
@@ -322,7 +316,7 @@ export default function BookPageContent() {
         </div>
 
         <div className="text-center">
-          <h1 className="text-[32px] font-bold tracking-tight md:text-[48px]">
+          <h1 className="text-[32px] font-bold tracking-tight text-balance md:text-[48px]">
             Schedule Your <span className="text-[#1d4ed8]">Appointment</span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed text-[#686878]">
@@ -340,7 +334,7 @@ export default function BookPageContent() {
 
             <a
               href={siteConfig.phoneHref}
-              className="mt-4 flex items-center justify-center gap-2 rounded-lg border border-[#22c55e]/20 bg-[#22c55e]/5 py-3 text-[13px] font-semibold text-[#22c55e] transition hover:bg-[#22c55e]/10"
+              className="mt-4 flex items-center justify-center gap-2 rounded-lg border border-[#22c55e]/20 bg-[#22c55e]/5 py-3 text-[13px] font-semibold text-[#22c55e] transition-[colors,transform,border-color] hover:bg-[#22c55e]/10 active:scale-[0.96]"
             >
               <Phone size={16} />
               Don&apos;t feel like filling forms? Call us now!
@@ -348,92 +342,64 @@ export default function BookPageContent() {
 
             <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-5">
 
-              {/* Row 1: 4 selects */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div>
+              {/* Row 1: Service + Extras (full width mobile), Date + Time (half mobile) */}
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="col-span-2 sm:col-span-1 lg:col-span-1">
                   <label htmlFor="requestedService" className={labelBase}>
                     Select Service <span className="text-[#dc2626]">*</span>
                   </label>
-                  <select id="requestedService" {...register("requestedService")} className={`${inputBase} mt-1.5`}>
-                    <option value="" className="bg-[#0a0a0f]">Choose a service</option>
-                    {serviceTiers.map((t) => (
-                      <option key={t.id} value={t.id} className="bg-[#0a0a0f]">
-                        {t.name}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="mt-1.5">
+                    <CustomSelect
+                      id="requestedService"
+                      value={requestedServiceValue}
+                      onChange={(v) => setValue("requestedService", v, { shouldValidate: true, shouldDirty: true })}
+                      options={serviceOptions}
+                      placeholder="Choose a service"
+                    />
+                  </div>
                   {errors.requestedService && <p className={errorBase}>{errors.requestedService.message}</p>}
                 </div>
 
-                <div>
+                <div className="col-span-2 sm:col-span-1 lg:col-span-1">
                   <label className={labelBase}>Select Extras (Optional)</label>
-                  <select
-                    className={`${inputBase} mt-1.5`}
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        toggleExtra(e.target.value);
-                        e.target.value = "";
-                      }
-                    }}
-                  >
-                    <option value="" className="bg-[#0a0a0f]">Choose extras</option>
-                    {serviceExtras.map((extra) => (
-                      <option key={extra.id} value={extra.id} className="bg-[#0a0a0f]">
-                        {extra.name} (+&pound;{extra.price})
-                      </option>
-                    ))}
-                  </select>
-                  {selectedExtras.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {selectedExtras.map((id) => {
-                        const extra = serviceExtras.find((e) => e.id === id);
-                        return extra ? (
-                          <span
-                            key={id}
-                            className="inline-flex items-center gap-1 rounded-full border border-[#1d4ed8]/20 bg-[#1d4ed8]/10 px-2.5 py-1 text-[11px] text-[#1d4ed8]"
-                          >
-                            {extra.name}
-                            <button
-                              type="button"
-                              onClick={() => toggleExtra(id)}
-                              className="ml-0.5 hover:text-white"
-                              aria-label={`Remove ${extra.name}`}
-                            >
-                              &times;
-                            </button>
-                          </span>
-                        ) : null;
-                      })}
-                    </div>
-                  )}
+                  <div className="mt-1.5">
+                    <CustomMultiSelect
+                      value={selectedExtras}
+                      onChange={(v) => setValue("selectedExtras", v, { shouldValidate: true, shouldDirty: true })}
+                      options={extraOptions}
+                      placeholder="Choose extras"
+                    />
+                  </div>
                 </div>
 
-                <div>
+                <div className="col-span-1">
                   <label htmlFor="requestedDate" className={labelBase}>
                     Select Date <span className="text-[#dc2626]">*</span>
                   </label>
-                  <input
-                    id="requestedDate"
-                    type="date"
-                    min={minDate}
-                    {...register("requestedDate")}
-                    className={`${inputBase} mt-1.5`}
-                  />
+                  <div className="mt-1.5">
+                    <CustomCalendar
+                      id="requestedDate"
+                      value={requestedDateValue}
+                      onChange={(v) => setValue("requestedDate", v, { shouldValidate: true, shouldDirty: true })}
+                      minDate={minDate}
+                    />
+                  </div>
                   {errors.requestedDate && <p className={errorBase}>{errors.requestedDate.message}</p>}
                 </div>
 
-                <div>
+                <div className="col-span-1">
                   <label htmlFor="requestedTime" className={labelBase}>
                     Select Time <span className="text-[#dc2626]">*</span>
                   </label>
-                  <select id="requestedTime" {...register("requestedTime")} className={`${inputBase} mt-1.5`}>
-                    <option value="" className="bg-[#0a0a0f]">Select time</option>
-                    {timeWindows.map((tw) => (
-                      <option key={tw} value={tw} className="bg-[#0a0a0f]">
-                        {tw}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="mt-1.5">
+                    <CustomSelect
+                      id="requestedTime"
+                      value={requestedTimeValue}
+                      onChange={(v) => setValue("requestedTime", v, { shouldValidate: true, shouldDirty: true })}
+                      options={timeOptions}
+                      placeholder="Select time"
+                    />
+                  </div>
                   {errors.requestedTime && <p className={errorBase}>{errors.requestedTime.message}</p>}
                 </div>
               </div>
@@ -499,9 +465,12 @@ export default function BookPageContent() {
                 </div>
               </div>
 
-              {/* Row 5: Car Make (1/4) | Model (1/4) | Car Location (1/2) */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-                <div className="sm:col-span-1">
+              {/* Vehicle & Location — 2×2 grid on mobile, desktop 4-col */}
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                {/* DOM order: Make, Model, Car Location, Registration, Color, Key Location, Map */}
+                {/* Mobile order: Make(1), Model(2), Registration(3), Color(4), Map(5), Car Location(6), Key Location(7) */}
+
+                <div className="order-1 sm:order-none col-span-1">
                   <label htmlFor="vehicleMake" className={labelBase}>
                     Car Make
                   </label>
@@ -513,7 +482,8 @@ export default function BookPageContent() {
                     className={`${inputBase} mt-1.5`}
                   />
                 </div>
-                <div className="sm:col-span-1">
+
+                <div className="order-2 sm:order-none col-span-1">
                   <label htmlFor="vehicleModel" className={labelBase}>
                     Model
                   </label>
@@ -525,12 +495,14 @@ export default function BookPageContent() {
                     className={`${inputBase} mt-1.5`}
                   />
                 </div>
-                <div className="sm:col-span-2">
+
+                {/* Desktop: Car Location sits on row 1 right (span 2) */}
+                <div className="order-6 sm:order-none col-span-2 sm:col-span-2">
                   <label htmlFor="postcode" className={labelBase}>
                     Car Location <span className="text-[#dc2626]">*</span>
                   </label>
                   <div className="mt-1.5 space-y-2">
-                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
+                    <div className="relative">
                       <input
                         id="postcode"
                         type="text"
@@ -550,15 +522,15 @@ export default function BookPageContent() {
                           const normalized = normalizeUkPostcode(event.target.value);
                           setValue("postcode", normalized, { shouldValidate: true, shouldDirty: true });
                         }}
-                        className={inputBase}
+                        className={`${inputBase} w-full pr-[116px]`}
                       />
                       <button
                         type="button"
                         onClick={findAddressOptions}
                         disabled={addressLookupLoading}
-                        className="inline-flex items-center justify-center rounded-lg border border-white/[0.08] px-3.5 py-2.5 text-[12px] font-semibold text-white transition hover:border-white/20 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 inline-flex items-center justify-center rounded-md border border-white/[0.08] bg-[#141419] px-3 py-1.5 text-[11px] font-semibold text-white transition hover:border-white/20 hover:bg-[#1a1a20] disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        {addressLookupLoading ? "Checking..." : "Check postcode"}
+                        {addressLookupLoading ? "Checking..." : "Check"}
                       </button>
                     </div>
 
@@ -592,11 +564,8 @@ export default function BookPageContent() {
                     </p>
                   </div>
                 </div>
-              </div>
 
-              {/* Row 6: Registration (1/4) | Color (1/4) | Key Location (1/2 with toggle) */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
-                <div className="sm:col-span-1">
+                <div className="order-3 sm:order-none col-span-1">
                   <label htmlFor="registration" className={labelBase}>
                     Registration
                   </label>
@@ -608,7 +577,8 @@ export default function BookPageContent() {
                     className={`${inputBase} mt-1.5`}
                   />
                 </div>
-                <div className="sm:col-span-1">
+
+                <div className="order-4 sm:order-none col-span-1">
                   <label htmlFor="colour" className={labelBase}>
                     Color
                   </label>
@@ -620,12 +590,12 @@ export default function BookPageContent() {
                     className={`${inputBase} mt-1.5`}
                   />
                 </div>
-                <div className="sm:col-span-2">
+
+                {/* Desktop: Key Location sits on row 2 right (span 2) */}
+                <div className="order-7 sm:order-none col-span-2 sm:col-span-2">
                   <label htmlFor="keyCollectionAddress" className={labelBase}>
                     Key Location
                   </label>
-                  {/* Make container relative so the switch can be absolutely positioned
-                      and vertically centered relative to the input field only. */}
                   <div className="mt-1.5 relative">
                     <input
                       id="keyCollectionAddress"
@@ -633,24 +603,36 @@ export default function BookPageContent() {
                       placeholder={keyCollectionSame ? "Same as car location" : "Enter key collection address"}
                       disabled={keyCollectionSame}
                       {...register("keyCollectionAddress")}
-                      // reserve space for the absolutely positioned switch on the right
                       className={`${inputBase} w-full pr-14 disabled:opacity-40`}
                     />
 
-                    <label
-                      htmlFor="keyCollectionSame"
+                    <button
+                      type="button"
+                      onClick={() => setKeyCollectionSame((v) => !v)}
                       className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex cursor-pointer items-center"
                       aria-label="Use car location as key collection address"
                       title="Toggle same as car location"
                     >
-                      <input
-                        id="keyCollectionSame"
-                        type="checkbox"
-                        {...register("keyCollectionSame")}
-                        className="peer sr-only"
+                      <span className="sr-only">Same as car location</span>
+                      <span
+                        className={`h-6 w-11 rounded-full relative transition-colors after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] ${keyCollectionSame ? "bg-[#22c55e] after:translate-x-full" : "bg-[#1a1a20]"}`}
                       />
-                      <div className="peer h-6 w-11 rounded-full bg-[#1a1a20] relative after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:bg-[#22c55e] peer-checked:after:translate-x-full peer-focus-visible:ring-2 peer-focus-visible:ring-[#1d4ed8]/40" />
-                    </label>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Mobile-only map, above Car Location */}
+                <div className="order-5 sm:order-none col-span-2 sm:hidden">
+                  <label className={labelBase}>Service Area</label>
+                  <div className="mt-1.5 h-44 overflow-hidden rounded-lg border border-white/[0.06]">
+                    <iframe
+                      title={postcodeContext?.postcode ? `Map for ${postcodeContext.postcode}` : "London service area"}
+                      src={mapEmbedSrc}
+                      className="h-full w-full border-0"
+                      style={{
+                        filter: "invert(90%) hue-rotate(180deg) brightness(0.75) contrast(1.1)",
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -690,7 +672,7 @@ export default function BookPageContent() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#1d4ed8] py-3.5 text-[13px] font-bold text-white transition hover:bg-[#1e40af] disabled:opacity-50 active:scale-[0.98]"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#1d4ed8] py-3.5 text-[13px] font-bold text-white transition-[colors,transform] hover:bg-[#1e40af] disabled:opacity-50 active:scale-[0.96]"
               >
                 {submitting ? (
                   <>

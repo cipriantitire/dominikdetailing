@@ -15,12 +15,12 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-[#09090d] text-white">
       <SiteHeader />
-      <main className="mx-auto max-w-7xl px-4 py-20 md:px-6 md:py-24">
+      <main className="mx-auto max-w-7xl px-4 pt-12 pb-20 md:px-6 md:pt-[70px] md:pb-24">
         <div className="text-center">
           <span className="text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
             Reach Out
           </span>
-          <h1 className="mt-3 text-[32px] font-bold tracking-tight md:text-[48px]">
+          <h1 className="mt-3 text-[32px] font-bold tracking-tight text-balance md:text-[48px]">
             Get in <span className="text-[#1d4ed8]">Touch</span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-[14px] leading-relaxed text-[#686878]">
@@ -84,14 +84,14 @@ export default function ContactPage() {
                 href={siteConfig.whatsapp}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg bg-[#22c55e] px-5 py-2.5 text-[13px] font-semibold text-[#09090d] transition hover:bg-[#16a34a] active:scale-[0.98] focus-visible:ring-1 focus-visible:ring-[#22c55e]/40 outline-none"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#22c55e] px-5 py-2.5 text-[13px] font-semibold text-[#09090d] transition-[colors,transform] hover:bg-[#16a34a] active:scale-[0.96] focus-visible:ring-1 focus-visible:ring-[#22c55e]/40 outline-none"
               >
                 <MessageChatSquare size={16} />
                 WhatsApp
               </a>
               <a
                 href={siteConfig.phoneHref}
-                className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-5 py-2.5 text-[13px] font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.03] active:scale-[0.98] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none"
+                className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-5 py-2.5 text-[13px] font-semibold text-white transition-[colors,transform,border-color] hover:border-white/20 hover:bg-white/[0.03] active:scale-[0.96] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none"
               >
                 <Phone size={16} />
                 Call Now
@@ -118,7 +118,7 @@ export default function ContactPage() {
             <div className="mt-8">
               <Link
                 href="/book"
-                className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-6 py-3 text-[13px] font-bold text-white transition hover:bg-[#1e40af] active:scale-[0.98]"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-6 py-3 text-[13px] font-bold text-white transition-[colors,transform] hover:bg-[#1e40af] active:scale-[0.96]"
               >
                 Book a Service
                 <ArrowRight size={14} />

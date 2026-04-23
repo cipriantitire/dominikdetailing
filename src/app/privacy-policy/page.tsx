@@ -5,12 +5,12 @@ export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-[#09090d] text-white">
       <SiteHeader />
-      <main className="mx-auto max-w-3xl px-4 py-20 md:px-6 md:py-24">
+      <main className="mx-auto max-w-3xl px-4 pt-12 pb-20 md:px-6 md:pt-[70px] md:pb-24">
         <div className="text-center md:text-left">
           <span className="text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
             Legal
           </span>
-          <h1 className="mt-3 text-[32px] font-bold tracking-tight md:text-[40px]">
+          <h1 className="mt-3 text-[32px] font-bold tracking-tight text-balance md:text-[40px]">
             Privacy Policy
           </h1>
         </div>
@@ -41,7 +41,7 @@ export default function PrivacyPolicyPage() {
 
           <h2 className="text-[16px] font-semibold text-white">Contact Us</h2>
           <p>
-            If you have any questions about this privacy policy, please contact us at info@dominikdetailing.co.uk.
+            If you have any questions about this privacy policy, please contact us at dominik@ddetailing.co.uk.
           </p>
         </div>
       </main>

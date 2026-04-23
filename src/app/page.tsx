@@ -93,13 +93,13 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-r from-[#09090d] via-[#09090d]/50 to-[#09090d]/0" />
         </div>
 
-        <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-16 pt-12 text-center md:px-6 md:pb-24 md:pt-[120px]">
+        <div className="relative mx-auto flex max-w-7xl flex-col items-center px-4 pb-16 pt-12 text-center md:px-6 md:pb-24 md:pt-[70px]">
           <span className="inline-flex items-center gap-2 rounded-full border border-[#c5a059]/30 bg-[#c5a059]/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
             <Star06 size={14} />
             Limited Time: 20% OFF First Service
           </span>
 
-          <h1 className="mx-auto mt-5 max-w-3xl text-[40px] font-bold leading-[1.05] tracking-tight md:text-[64px] lg:text-[72px]">
+          <h1 className="mx-auto mt-5 max-w-3xl text-[40px] font-bold leading-[1.05] tracking-tight text-balance md:text-[64px] lg:text-[72px]">
             Premium car care.
             <br />
             <span className="text-[#9696a3]">Mobile.</span>
@@ -132,12 +132,12 @@ export default function Home() {
       {/* Services — 2-column asymmetric on desktop */}
       <section className="px-4 py-24 md:px-6">
         <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <div className="flex flex-col gap-4">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
                 Our Services
               </span>
-              <h2 className="mt-3 text-[32px] font-bold tracking-tight md:text-[44px]">
+              <h2 className="mt-3 text-[32px] font-bold tracking-tight text-balance md:text-[44px]">
                 Premium Auto Care
               </h2>
             </div>
@@ -186,7 +186,7 @@ export default function Home() {
                   <div className="mt-auto pt-5">
           <Link
             href={`/book?service=${service.id}`}
-            className="block rounded-lg bg-[#1d4ed8] py-2.5 text-center text-[13px] font-semibold text-white transition hover:bg-[#1e40af] active:scale-[0.98]"
+            className="block rounded-lg bg-[#1d4ed8] py-2.5 text-center text-[13px] font-semibold text-white transition-[colors,transform] hover:bg-[#1e40af] active:scale-[0.96]"
           >
             Request Booking
           </Link>
@@ -205,7 +205,7 @@ export default function Home() {
             <span className="text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
               Add-Ons
             </span>
-            <h2 className="mt-3 text-[28px] font-bold tracking-tight md:text-[36px]">
+            <h2 className="mt-3 text-[28px] font-bold tracking-tight text-balance md:text-[36px]">
               Extras &amp; Add-Ons
             </h2>
           </div>
@@ -216,7 +216,7 @@ export default function Home() {
                 className="flex flex-col items-center justify-center rounded-xl border border-white/[0.04] bg-[#0f0f14] p-5 text-center transition hover:border-white/[0.08]"
               >
                 <span className="text-[13px] font-medium text-white">{extra.name}</span>
-                <span className="mt-1.5 text-[15px] font-bold text-[#c5a059]">+&pound;{extra.price}</span>
+                <span className="mt-1.5 text-[15px] font-bold text-[#c5a059] tabular-nums">+&pound;{extra.price}</span>
               </div>
             ))}
           </div>
@@ -230,7 +230,7 @@ export default function Home() {
             <span className="text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
               Results
             </span>
-            <h2 className="mt-3 text-[32px] font-bold tracking-tight md:text-[44px]">
+            <h2 className="mt-3 text-[32px] font-bold tracking-tight text-balance md:text-[44px]">
               See the Difference
             </h2>
             <p className="mt-4 max-w-md text-[14px] leading-relaxed text-[#686878]">
@@ -304,7 +304,7 @@ export default function Home() {
           <div className="mt-8">
             <Link
               href="/gallery"
-              className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#1d4ed8] transition hover:text-[#3b6cb7] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
+              className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#1d4ed8] transition-[colors,transform] hover:text-[#3b6cb7] active:scale-[0.96] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded"
             >
               View full gallery
               <ArrowRight size={16} />
@@ -320,7 +320,7 @@ export default function Home() {
             <span className="text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
               Testimonials
             </span>
-            <h2 className="mt-3 text-[32px] font-bold tracking-tight md:text-[44px]">
+            <h2 className="mt-3 text-[32px] font-bold tracking-tight text-balance md:text-[44px]">
               What Our Clients Say
             </h2>
           </div>
@@ -371,7 +371,7 @@ export default function Home() {
               <span className="text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
                 Coverage
               </span>
-              <h2 className="mt-3 text-[32px] font-bold tracking-tight md:text-[44px]">
+              <h2 className="mt-3 text-[32px] font-bold tracking-tight text-balance md:text-[44px]">
                 Mobile Service Across London
               </h2>
               <p className="mt-4 max-w-md text-[14px] leading-relaxed text-[#686878]">
@@ -400,7 +400,7 @@ export default function Home() {
             <span className="text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
               Process
             </span>
-            <h2 className="mt-3 text-[32px] font-bold tracking-tight md:text-[44px]">
+            <h2 className="mt-3 text-[32px] font-bold tracking-tight text-balance md:text-[44px]">
               How It Works
             </h2>
           </div>
@@ -452,7 +452,7 @@ export default function Home() {
             <span className="text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
               FAQ
             </span>
-            <h2 className="mt-3 text-[32px] font-bold tracking-tight md:text-[44px]">
+            <h2 className="mt-3 text-[32px] font-bold tracking-tight text-balance md:text-[44px]">
               Common Questions
             </h2>
           </div>
@@ -463,7 +463,7 @@ export default function Home() {
                 key={i}
                 className="group rounded-xl border border-white/[0.04] bg-[#0f0f14] transition open:border-white/[0.08]"
               >
-                <summary className="flex cursor-pointer items-center justify-between p-5 text-[14px] font-semibold text-white transition hover:bg-[#141419] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded-xl">
+                <summary className="flex cursor-pointer items-center justify-between p-5 text-[14px] font-semibold text-white transition-[colors,transform] hover:bg-[#141419] active:scale-[0.99] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded-xl">
                   {faq.question}
                   <svg
                     className="h-4 w-4 shrink-0 text-[#686878] transition-transform duration-300 group-open:rotate-180"
@@ -488,7 +488,7 @@ export default function Home() {
       {/* Final CTA */}
       <section className="px-4 py-24 md:px-6">
         <div className="mx-auto max-w-4xl rounded-2xl border border-white/[0.04] bg-[#0f0f14] p-8 text-center md:p-14">
-          <h2 className="text-[28px] font-bold tracking-tight md:text-[40px]">
+          <h2 className="text-[28px] font-bold tracking-tight text-balance md:text-[40px]">
             Ready to give your car the care it deserves?
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-[14px] leading-relaxed text-[#686878]">
@@ -497,14 +497,14 @@ export default function Home() {
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/book"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-8 py-3.5 text-[13px] font-bold text-white transition hover:bg-[#1e40af] active:scale-[0.98]"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-8 py-3.5 text-[13px] font-bold text-white transition-[colors,transform] hover:bg-[#1e40af] active:scale-[0.96]"
             >
               Request Booking
               <ArrowRight size={16} />
             </Link>
             <a
               href={siteConfig.phoneHref}
-              className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-8 py-3.5 text-[13px] font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.03]"
+              className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-8 py-3.5 text-[13px] font-semibold text-white transition-[colors,transform,border-color] hover:border-white/20 hover:bg-white/[0.03] active:scale-[0.96]"
             >
               <Phone size={16} />
               Call {siteConfig.phone}

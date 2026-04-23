@@ -48,7 +48,7 @@ export default function SiteHeader() {
 
       {/* Navbar */}
       <header className="sticky top-0 z-50 border-b border-white/[0.04] bg-[#09090d]/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:grid md:grid-cols-[1fr_auto_1fr] md:px-6">
           <Link
             href="/"
             className="flex items-center gap-2.5 text-[15px] font-semibold tracking-tight text-white focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none rounded-lg"
@@ -66,7 +66,7 @@ export default function SiteHeader() {
             </span>
           </Link>
 
-          {/* Desktop nav */}
+          {/* Desktop nav — centered in the middle column */}
           <nav className="hidden items-center gap-8 md:flex">
             {navLinks.map((link) => (
               <Link
@@ -79,17 +79,17 @@ export default function SiteHeader() {
             ))}
           </nav>
 
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="hidden items-center justify-end gap-3 md:flex">
             <a
               href={siteConfig.phoneHref}
-              className="flex items-center gap-2 rounded-lg border border-[#22c55e]/25 px-4 py-2 text-[13px] font-semibold text-[#22c55e] transition hover:border-[#22c55e]/50 hover:bg-[#22c55e]/5 focus-visible:ring-1 focus-visible:ring-[#22c55e]/40 outline-none"
+              className="flex items-center gap-2 rounded-lg border border-[#22c55e]/25 px-4 py-2 text-[13px] font-semibold text-[#22c55e] transition-[colors,transform] hover:border-[#22c55e]/50 hover:bg-[#22c55e]/5 active:scale-[0.96] focus-visible:ring-1 focus-visible:ring-[#22c55e]/40 outline-none"
             >
               <Phone size={16} />
               Call
             </a>
             <Link
               href="/book"
-              className="rounded-lg bg-[#1d4ed8] px-5 py-2 text-[13px] font-semibold text-white transition hover:bg-[#1e40af] active:scale-[0.98] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none"
+              className="rounded-lg bg-[#1d4ed8] px-5 py-2 text-[13px] font-semibold text-white transition-[colors,transform] hover:bg-[#1e40af] active:scale-[0.96] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none"
             >
               Request Booking
             </Link>
@@ -107,7 +107,7 @@ export default function SiteHeader() {
               <span className="transition-opacity duration-300">Call</span>
             </a>
             <button
-              className="flex h-10 w-10 items-center justify-center rounded-lg text-white transition hover:bg-white/5"
+              className="flex h-10 w-10 items-center justify-center rounded-lg text-white transition-[colors,transform] hover:bg-white/5 active:scale-[0.96]"
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
               aria-expanded={menuOpen}
@@ -128,7 +128,7 @@ export default function SiteHeader() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-lg px-3 py-3 text-[14px] font-medium text-[#9696a3] transition hover:bg-white/[0.03] hover:text-white focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none"
+                className="rounded-lg px-3 py-3 text-[14px] font-medium text-[#9696a3] transition-[colors,transform] hover:bg-white/[0.03] hover:text-white active:scale-[0.98] focus-visible:ring-1 focus-visible:ring-[#1d4ed8]/40 outline-none"
                 onClick={() => setMenuOpen(false)}
               >
                 {link.label}
@@ -138,14 +138,14 @@ export default function SiteHeader() {
           <div className="mt-4 flex flex-col gap-3">
             <a
               href={siteConfig.phoneHref}
-              className="flex items-center justify-center gap-2 rounded-lg border border-[#22c55e]/25 px-4 py-3 text-[13px] font-semibold text-[#22c55e] transition hover:border-[#22c55e]/50 hover:bg-[#22c55e]/5"
+              className="flex items-center justify-center gap-2 rounded-lg border border-[#22c55e]/25 px-4 py-3 text-[13px] font-semibold text-[#22c55e] transition-[colors,transform] hover:border-[#22c55e]/50 hover:bg-[#22c55e]/5 active:scale-[0.96]"
             >
               <Phone size={16} />
               Call {siteConfig.phone}
             </a>
             <Link
               href="/book"
-              className="rounded-lg bg-[#1d4ed8] px-4 py-3 text-center text-[13px] font-semibold text-white transition hover:bg-[#1e40af]"
+              className="rounded-lg bg-[#1d4ed8] px-4 py-3 text-center text-[13px] font-semibold text-white transition-[colors,transform] hover:bg-[#1e40af] active:scale-[0.96]"
               onClick={() => setMenuOpen(false)}
             >
               Request Booking

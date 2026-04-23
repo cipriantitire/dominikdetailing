@@ -9,12 +9,12 @@ export default function ServicesPage() {
   return (
     <div className="min-h-screen bg-[#09090d] text-white">
       <SiteHeader />
-      <main className="mx-auto max-w-7xl px-4 py-20 md:px-6 md:py-24">
+      <main className="mx-auto max-w-7xl px-4 pt-12 pb-20 md:px-6 md:pt-[70px] md:pb-24">
         <div className="text-center">
           <span className="text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
             What We Offer
           </span>
-          <h1 className="mt-3 text-[32px] font-bold tracking-tight md:text-[48px]">
+          <h1 className="mt-3 text-[32px] font-bold tracking-tight text-balance md:text-[48px]">
             Our <span className="text-[#1d4ed8]">Services</span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-[14px] leading-relaxed text-[#686878]">
@@ -40,7 +40,7 @@ export default function ServicesPage() {
               <div className="flex flex-col p-6">
                 <div className="flex items-start justify-between">
                   <h2 className="text-[18px] font-bold">{service.name}</h2>
-                  <span className="rounded bg-[#1d4ed8]/10 px-2 py-1 text-[12px] font-bold text-[#1d4ed8]">
+                  <span className="rounded bg-[#1d4ed8]/10 px-2 py-1 text-[12px] font-bold text-[#1d4ed8] tabular-nums">
                     From &pound;{service.startingPrice}
                   </span>
                 </div>
@@ -56,7 +56,7 @@ export default function ServicesPage() {
                 <div className="mt-auto pt-6">
                   <Link
                     href={`/book?service=${service.id}`}
-                    className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-5 py-2.5 text-[13px] font-semibold text-white transition hover:bg-[#1e40af] active:scale-[0.98]"
+                    className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-5 py-2.5 text-[13px] font-semibold text-white transition-[colors,transform] hover:bg-[#1e40af] active:scale-[0.96]"
                   >
                     Request Booking
                     <ArrowRight size={14} />
@@ -68,7 +68,7 @@ export default function ServicesPage() {
         </div>
 
         <div className="mt-20">
-          <h2 className="text-center text-[28px] font-bold tracking-tight md:text-[36px]">
+          <h2 className="text-center text-[28px] font-bold tracking-tight text-balance md:text-[36px]">
             Extras &amp; Add-Ons
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-center text-[14px] text-[#686878]">
@@ -81,7 +81,7 @@ export default function ServicesPage() {
                 className="flex flex-col items-center justify-center rounded-xl border border-white/[0.04] bg-[#0f0f14] p-6 text-center"
               >
                 <span className="text-[13px] font-medium text-white">{extra.name}</span>
-                <span className="mt-2 text-[18px] font-bold text-[#c5a059]">+&pound;{extra.price}</span>
+                <span className="mt-2 text-[18px] font-bold text-[#c5a059] tabular-nums">+&pound;{extra.price}</span>
               </div>
             ))}
           </div>

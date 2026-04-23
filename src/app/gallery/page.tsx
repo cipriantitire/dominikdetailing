@@ -11,11 +11,11 @@ export default function GalleryPage() {
       <SiteHeader />
       <main>
         {/* Intro — tight bottom padding so the dome sits immediately underneath */}
-        <section className="px-4 pb-0 pt-24 text-center md:px-6 md:pb-4 md:pt-32">
+        <section className="px-4 pb-0 pt-12 text-center md:px-6 md:pb-4 md:pt-[70px]">
           <span className="text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
             Gallery
           </span>
-          <h1 className="mt-3 text-[32px] font-bold tracking-tight md:text-[48px]">
+          <h1 className="mt-3 text-[32px] font-bold tracking-tight text-balance md:text-[48px]">
             Real cars. <span className="text-[#c5a059]">Real results.</span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-[14px] leading-relaxed text-[#686878]">
@@ -24,8 +24,8 @@ export default function GalleryPage() {
           </p>
         </section>
 
-        {/* DomeGallery — smaller radius so it fits fully in view on all breakpoints */}
-        <section className="relative h-[82dvh] md:h-[58vh] md:min-h-[480px] md:max-h-[720px]">
+        {/* DomeGallery — compact on mobile so images sit close to text */}
+        <section className="relative h-[64dvh] md:h-[58vh] md:min-h-[480px] md:max-h-[720px]">
           <DomeGallery
             images={galleryItems}
             segments={22}
@@ -34,8 +34,8 @@ export default function GalleryPage() {
             minRadius={320}
             padFactor={0.12}
             overlayBlurColor="#09090d"
-            maxVerticalRotationDeg={4}
-            dragSensitivity={26}
+            maxVerticalRotationDeg={0}
+            dragSensitivity={4}
             enlargeTransitionMs={320}
             dragDampening={2.2}
             openedImageWidth="min(90vw, 420px)"
@@ -59,7 +59,7 @@ export default function GalleryPage() {
               <span className="text-[11px] font-bold uppercase tracking-widest text-[#c5a059]">
                 Standards
               </span>
-              <h2 className="mt-3 text-[24px] font-bold tracking-tight md:text-[32px]">
+              <h2 className="mt-3 text-[24px] font-bold tracking-tight text-balance md:text-[32px]">
                 Finish quality you can inspect
               </h2>
               <p className="mt-4 text-[14px] leading-relaxed text-[#686878]">
@@ -74,13 +74,13 @@ export default function GalleryPage() {
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/book"
-                  className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-6 py-3 text-[13px] font-semibold text-white transition hover:bg-[#1e40af] active:scale-[0.98]"
+                  className="inline-flex items-center gap-2 rounded-lg bg-[#1d4ed8] px-6 py-3 text-[13px] font-semibold text-white transition-[colors,transform] hover:bg-[#1e40af] active:scale-[0.96]"
                 >
                   Request a booking
                 </Link>
                 <Link
                   href="/services"
-                  className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-6 py-3 text-[13px] font-semibold text-white transition hover:border-white/20 hover:bg-white/[0.03]"
+                  className="inline-flex items-center gap-2 rounded-lg border border-white/[0.08] px-6 py-3 text-[13px] font-semibold text-white transition-[colors,transform,border-color] hover:border-white/20 hover:bg-white/[0.03] active:scale-[0.96]"
                 >
                   View services
                 </Link>

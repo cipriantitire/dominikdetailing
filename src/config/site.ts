@@ -4,7 +4,7 @@ export const siteConfig = {
   phone: "07438 901518",
   phoneHref: "tel:+447438901518",
   whatsapp: "https://wa.me/447438901518",
-  email: "info@dominikdetailing.co.uk",
+  email: "dominik@ddetailing.co.uk",
   address: "London, GB",
   hours: {
     weekday: "Mon - Fri: 8:00 AM - 6:00 PM",
