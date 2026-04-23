@@ -88,31 +88,31 @@ export default function GalleryPage() {
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <BeforeAfterSlider
-                beforeSrc={galleryItems[0].src}
-                afterSrc={galleryItems[1].src}
-                beforeAlt={galleryItems[0].alt}
-                afterAlt={galleryItems[1].alt}
+                beforeSrc="/before-after/before%201.png"
+                afterSrc="/before-after/after%201.png"
+                beforeAlt="Before treatment"
+                afterAlt="After treatment"
                 className="aspect-[4/3] w-full"
               />
               <BeforeAfterSlider
-                beforeSrc={galleryItems[2].src}
-                afterSrc={galleryItems[3].src}
-                beforeAlt={galleryItems[2].alt}
-                afterAlt={galleryItems[3].alt}
+                beforeSrc="/before-after/before%202.jpg"
+                afterSrc="/before-after/after%202.jpg"
+                beforeAlt="Before treatment"
+                afterAlt="After treatment"
                 className="aspect-[4/3] w-full"
               />
               <BeforeAfterSlider
-                beforeSrc={galleryItems[4].src}
-                afterSrc={galleryItems[5].src}
-                beforeAlt={galleryItems[4].alt}
-                afterAlt={galleryItems[5].alt}
+                beforeSrc="/before-after/before%203.jpg"
+                afterSrc="/before-after/after%203.jpg"
+                beforeAlt="Before treatment"
+                afterAlt="After treatment"
                 className="aspect-[4/3] w-full"
               />
               <BeforeAfterSlider
-                beforeSrc={galleryItems[6].src}
-                afterSrc={galleryItems[7].src}
-                beforeAlt={galleryItems[6].alt}
-                afterAlt={galleryItems[7].alt}
+                beforeSrc="/before-after/before%204.jpg"
+                afterSrc="/before-after/after%204.jpg"
+                beforeAlt="Before treatment"
+                afterAlt="After treatment"
                 className="aspect-[4/3] w-full"
               />
             </div>

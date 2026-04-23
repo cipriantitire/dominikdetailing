@@ -44,6 +44,9 @@ export default function BeforeAfterSlider({
 
   const onPointerUp = () => setDragging(false);
 
+  const beforeOpacity = Math.min(1, pos / 20);
+  const afterOpacity = Math.min(1, (100 - pos) / 20);
+
   return (
     <div
       ref={containerRef}
@@ -64,10 +67,10 @@ export default function BeforeAfterSlider({
         draggable={false}
       />
 
-      {/* After image (clipped overlay) */}
+      {/* After image (clipped overlay, visible on the right side) */}
       <div
         className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl"
-        style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
+        style={{ clipPath: `inset(0 0 0 ${pos}%)` }}
       >
         <Image
           src={afterSrc}
@@ -101,10 +104,16 @@ export default function BeforeAfterSlider({
       </div>
 
       {/* Labels */}
-      <span className="absolute top-3 left-3 rounded bg-black/60 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+      <span
+        className="absolute top-3 left-3 rounded bg-black/60 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm transition-opacity duration-200"
+        style={{ opacity: beforeOpacity }}
+      >
         Before
       </span>
-      <span className="absolute top-3 right-3 rounded bg-[#c5a059]/90 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#09090d]">
+      <span
+        className="absolute top-3 right-3 rounded bg-[#c5a059]/90 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#09090d] transition-opacity duration-200"
+        style={{ opacity: afterOpacity }}
+      >
         After
       </span>
     </div>
