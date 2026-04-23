@@ -25,7 +25,7 @@ export default function GalleryPage() {
         </section>
 
         {/* DomeGallery — compact on mobile so images sit close to text */}
-        <section className="relative h-[64dvh] md:h-[58vh] md:min-h-[480px] md:max-h-[720px]">
+        <section className="relative h-[64dvh] overflow-hidden md:h-[58vh] md:min-h-[480px] md:max-h-[720px]">
           <DomeGallery
             images={galleryItems}
             segments={22}
